@@ -100,8 +100,7 @@ h3 {
   background: var(--warn-bg);
 }
 
-.tips,
-.sources {
+.tips {
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--card);
