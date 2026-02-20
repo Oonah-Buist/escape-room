@@ -6,6 +6,8 @@ const doorBubble = document.getElementById("doorBubble");
 const leftWallHotspots = document.querySelectorAll(".hotspot-word");
 const leftWallBubble = document.getElementById("leftWallBubble");
 const leftWall = document.querySelector(".wall-left");
+const windowHotspot = document.querySelector(".hotspot-window");
+const windowModal = document.getElementById("windowModal");
 const rightWallHotspots = document.querySelectorAll(".hotspot-cancer");
 const rightWallBubble = document.getElementById("rightWallBubble");
 const rightWall = document.querySelector(".wall-right");
@@ -22,6 +24,7 @@ let bubbleTimerId = null;
 let leftBubbleTimerId = null;
 let rightBubbleTimerId = null;
 let audioContext = null;
+let windowOpenedAt = 0;
 
 function renderView() {
   const view = views[currentViewIndex];
@@ -86,6 +89,19 @@ function showDoorMessage() {
     doorBubble.classList.remove("is-visible");
     bubbleTimerId = null;
   }, 2600);
+}
+
+function openWindowModal() {
+  if (!windowModal) return;
+  windowOpenedAt = Date.now();
+  windowModal.classList.add("is-open");
+  windowModal.setAttribute("aria-hidden", "false");
+}
+
+function closeWindowModal() {
+  if (!windowModal) return;
+  windowModal.classList.remove("is-open");
+  windowModal.setAttribute("aria-hidden", "true");
 }
 
 function getHotspotBounds(hotspot) {
@@ -161,8 +177,55 @@ function findWordHotspotAtPoint(wall, hotspots, clientX, clientY) {
   );
 }
 
+function pointInWindowRegion(clientX, clientY) {
+  if (!leftWall) return false;
+  const rect = leftWall.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+    return false;
+  }
+
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  const yPct = ((clientY - rect.top) / rect.height) * 100;
+
+  const windowX = 29;
+  const windowY = 42;
+  const windowW = 34;
+  const windowH = 44;
+  return (
+    xPct >= windowX &&
+    xPct <= windowX + windowW &&
+    yPct >= windowY &&
+    yPct <= windowY + windowH
+  );
+}
+
 controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
+});
+
+if (windowHotspot) {
+  const onWindowActivate = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openWindowModal();
+  };
+  windowHotspot.addEventListener("click", onWindowActivate);
+}
+
+if (windowModal) {
+  windowModal.addEventListener("click", (event) => {
+    if (Date.now() - windowOpenedAt < 250) return;
+    if (event.target === windowModal) {
+      closeWindowModal();
+    }
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeWindowModal();
+  }
 });
 
 if (doorHotspot) {
@@ -198,8 +261,13 @@ if (scene) {
   scene.addEventListener("click", (event) => {
     if (event.target.closest(".arrow-controls")) return;
     if (event.target.closest(".hotspot-door")) return;
+    if (event.target.closest(".hotspot-window")) return;
     const activeView = views[currentViewIndex];
     if (activeView === "left") {
+      if (pointInWindowRegion(event.clientX, event.clientY)) {
+        openWindowModal();
+        return;
+      }
       const leftHotspot = findWordHotspotAtPoint(leftWall, leftWallHotspots, event.clientX, event.clientY);
       if (leftHotspot) {
         showLeftWallMessage(leftHotspot);
