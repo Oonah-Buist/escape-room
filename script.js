@@ -79,6 +79,40 @@ function playBuzzer() {
   });
 }
 
+function playSparkle() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  if (ctx.state === "suspended") {
+    ctx.resume();
+  }
+
+  const now = ctx.currentTime;
+  const notes = [
+    { start: 0, freq: 1200, duration: 0.12, level: 0.06 },
+    { start: 0.08, freq: 1580, duration: 0.1, level: 0.05 },
+    { start: 0.16, freq: 1880, duration: 0.14, level: 0.045 },
+  ];
+
+  notes.forEach((note) => {
+    const t0 = now + note.start;
+    const t1 = t0 + note.duration;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(note.level, t0 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t1);
+    gain.connect(ctx.destination);
+
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(note.freq, t0);
+    osc.frequency.exponentialRampToValueAtTime(note.freq * 1.08, t1);
+    osc.connect(gain);
+    osc.start(t0);
+    osc.stop(t1 + 0.01);
+  });
+}
+
 function showDoorMessage() {
   if (!doorBubble) return;
   doorBubble.classList.add("is-visible");
@@ -96,6 +130,7 @@ function openWindowModal() {
   windowOpenedAt = Date.now();
   windowModal.classList.add("is-open");
   windowModal.setAttribute("aria-hidden", "false");
+  playSparkle();
 }
 
 function closeWindowModal() {
