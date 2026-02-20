@@ -84,8 +84,27 @@ function showDoorMessage() {
   }, 2600);
 }
 
-function showLeftWallMessage() {
+function getHotspotBounds(hotspot) {
+  const x = parseFloat(hotspot.style.getPropertyValue("--x"));
+  const y = parseFloat(hotspot.style.getPropertyValue("--y"));
+  const w = parseFloat(hotspot.style.getPropertyValue("--w"));
+  const h = parseFloat(hotspot.style.getPropertyValue("--h"));
+  return { x, y, w, h };
+}
+
+function positionLeftWallBubble(hotspot) {
+  if (!leftWallBubble || !hotspot) return;
+  const { x, y, w } = getHotspotBounds(hotspot);
+  const centerX = x + w / 2;
+  const clampedX = Math.max(22, Math.min(78, centerX));
+  const clampedTop = Math.max(4, y - 10);
+  leftWallBubble.style.left = `${clampedX}%`;
+  leftWallBubble.style.top = `${clampedTop}%`;
+}
+
+function showLeftWallMessage(hotspot) {
   if (!leftWallBubble) return;
+  positionLeftWallBubble(hotspot);
   leftWallBubble.classList.add("is-visible");
   if (leftBubbleTimerId) {
     clearTimeout(leftBubbleTimerId);
@@ -96,24 +115,23 @@ function showLeftWallMessage() {
   }, 2600);
 }
 
-function clickHitsLeftWordRegion(clientX, clientY) {
-  if (!leftWall || !leftWallHotspots.length) return false;
+function findLeftWordHotspotAtPoint(clientX, clientY) {
+  if (!leftWall || !leftWallHotspots.length) return null;
   const rect = leftWall.getBoundingClientRect();
-  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (rect.width <= 0 || rect.height <= 0) return null;
   if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-    return false;
+    return null;
   }
 
   const xPct = ((clientX - rect.left) / rect.width) * 100;
   const yPct = ((clientY - rect.top) / rect.height) * 100;
 
-  return Array.from(leftWallHotspots).some((hotspot) => {
-    const x = parseFloat(hotspot.style.getPropertyValue("--x"));
-    const y = parseFloat(hotspot.style.getPropertyValue("--y"));
-    const w = parseFloat(hotspot.style.getPropertyValue("--w"));
-    const h = parseFloat(hotspot.style.getPropertyValue("--h"));
-    return xPct >= x && xPct <= x + w && yPct >= y && yPct <= y + h;
-  });
+  return (
+    Array.from(leftWallHotspots).find((hotspot) => {
+      const { x, y, w, h } = getHotspotBounds(hotspot);
+      return xPct >= x && xPct <= x + w && yPct >= y && yPct <= y + h;
+    }) || null
+  );
 }
 
 controls.forEach((control) => {
@@ -130,30 +148,22 @@ if (doorHotspot) {
 leftWallHotspots.forEach((hotspot) => {
   hotspot.addEventListener("pointerup", (event) => {
     event.preventDefault();
-    showLeftWallMessage();
+    showLeftWallMessage(hotspot);
   });
   hotspot.addEventListener("click", (event) => {
     event.preventDefault();
-    showLeftWallMessage();
+    showLeftWallMessage(hotspot);
   });
 });
-
-if (leftWall) {
-  leftWall.addEventListener("click", (event) => {
-    if (event.target.closest(".hotspot-word")) return;
-    if (views[currentViewIndex] === "left") {
-      showLeftWallMessage();
-    }
-  });
-}
 
 if (scene) {
   scene.addEventListener("click", (event) => {
     if (views[currentViewIndex] !== "left") return;
     if (event.target.closest(".arrow-controls")) return;
     if (event.target.closest(".hotspot-door")) return;
-    if (clickHitsLeftWordRegion(event.clientX, event.clientY)) {
-      showLeftWallMessage();
+    const hotspot = findLeftWordHotspotAtPoint(event.clientX, event.clientY);
+    if (hotspot) {
+      showLeftWallMessage(hotspot);
     }
   });
 }
