@@ -2,7 +2,9 @@ const room = document.getElementById("room");
 const scene = document.querySelector(".scene");
 const controls = document.querySelectorAll(".arrow");
 const doorHotspot = document.querySelector(".hotspot-door");
+const switchHotspot = document.querySelector(".hotspot-switch");
 const doorBubble = document.getElementById("doorBubble");
+const frontWall = document.querySelector(".wall-front");
 const leftWallHotspots = document.querySelectorAll(".hotspot-word");
 const leftWallBubble = document.getElementById("leftWallBubble");
 const leftWall = document.querySelector(".wall-left");
@@ -10,6 +12,7 @@ const windowHotspot = document.querySelector(".hotspot-window");
 const windowModal = document.getElementById("windowModal");
 const curtainHotspot = document.querySelector(".hotspot-curtain");
 const curtainModal = document.getElementById("curtainModal");
+const switchModal = document.getElementById("switchModal");
 const rightWallHotspots = document.querySelectorAll(".hotspot-cancer");
 const rightWallBubble = document.getElementById("rightWallBubble");
 const rightWall = document.querySelector(".wall-right");
@@ -28,6 +31,7 @@ let rightBubbleTimerId = null;
 let audioContext = null;
 let windowOpenedAt = 0;
 let curtainOpenedAt = 0;
+let switchOpenedAt = 0;
 
 function renderView() {
   const view = views[currentViewIndex];
@@ -156,6 +160,20 @@ function closeCurtainModal() {
   curtainModal.setAttribute("aria-hidden", "true");
 }
 
+function openSwitchModal() {
+  if (!switchModal) return;
+  switchOpenedAt = Date.now();
+  switchModal.classList.add("is-open");
+  switchModal.setAttribute("aria-hidden", "false");
+  playSparkle();
+}
+
+function closeSwitchModal() {
+  if (!switchModal) return;
+  switchModal.classList.remove("is-open");
+  switchModal.setAttribute("aria-hidden", "true");
+}
+
 function getHotspotBounds(hotspot) {
   const x = parseFloat(hotspot.style.getPropertyValue("--x"));
   const y = parseFloat(hotspot.style.getPropertyValue("--y"));
@@ -275,6 +293,29 @@ function pointInCurtainRegion(clientX, clientY) {
   );
 }
 
+function pointInSwitchRegion(clientX, clientY) {
+  if (!frontWall) return false;
+  const rect = frontWall.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+    return false;
+  }
+
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  const yPct = ((clientY - rect.top) / rect.height) * 100;
+
+  const switchX = 72.5;
+  const switchY = 42.5;
+  const switchW = 12.5;
+  const switchH = 12;
+  return (
+    xPct >= switchX &&
+    xPct <= switchX + switchW &&
+    yPct >= switchY &&
+    yPct <= switchY + switchH
+  );
+}
+
 controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
 });
@@ -297,6 +338,16 @@ if (curtainHotspot) {
   curtainHotspot.addEventListener("click", onCurtainActivate);
 }
 
+if (switchHotspot) {
+  const onSwitchActivate = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openSwitchModal();
+  };
+  switchHotspot.addEventListener("pointerup", onSwitchActivate);
+  switchHotspot.addEventListener("click", onSwitchActivate);
+}
+
 if (windowModal) {
   windowModal.addEventListener("click", (event) => {
     if (Date.now() - windowOpenedAt < 250) return;
@@ -315,10 +366,20 @@ if (curtainModal) {
   });
 }
 
+if (switchModal) {
+  switchModal.addEventListener("click", (event) => {
+    if (Date.now() - switchOpenedAt < 250) return;
+    if (event.target === switchModal) {
+      closeSwitchModal();
+    }
+  });
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeWindowModal();
     closeCurtainModal();
+    closeSwitchModal();
   }
 });
 
@@ -353,11 +414,18 @@ rightWallHotspots.forEach((hotspot) => {
 
 if (scene) {
   scene.addEventListener("click", (event) => {
+    const activeView = views[currentViewIndex];
+    if (activeView === "front") {
+      if (pointInSwitchRegion(event.clientX, event.clientY)) {
+        openSwitchModal();
+        return;
+      }
+    }
     if (event.target.closest(".arrow-controls")) return;
     if (event.target.closest(".hotspot-door")) return;
     if (event.target.closest(".hotspot-window")) return;
     if (event.target.closest(".hotspot-curtain")) return;
-    const activeView = views[currentViewIndex];
+    if (event.target.closest(".hotspot-switch")) return;
     if (activeView === "left") {
       if (pointInWindowRegion(event.clientX, event.clientY)) {
         openWindowModal();
