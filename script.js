@@ -6,6 +6,9 @@ const doorBubble = document.getElementById("doorBubble");
 const leftWallHotspots = document.querySelectorAll(".hotspot-word");
 const leftWallBubble = document.getElementById("leftWallBubble");
 const leftWall = document.querySelector(".wall-left");
+const rightWallHotspots = document.querySelectorAll(".hotspot-cancer");
+const rightWallBubble = document.getElementById("rightWallBubble");
+const rightWall = document.querySelector(".wall-right");
 
 const views = ["left", "front", "right"];
 const viewAngles = {
@@ -17,6 +20,7 @@ const viewAngles = {
 let currentViewIndex = 1;
 let bubbleTimerId = null;
 let leftBubbleTimerId = null;
+let rightBubbleTimerId = null;
 let audioContext = null;
 
 function renderView() {
@@ -115,9 +119,32 @@ function showLeftWallMessage(hotspot) {
   }, 2600);
 }
 
-function findLeftWordHotspotAtPoint(clientX, clientY) {
-  if (!leftWall || !leftWallHotspots.length) return null;
-  const rect = leftWall.getBoundingClientRect();
+function positionRightWallBubble(hotspot) {
+  if (!rightWallBubble || !hotspot) return;
+  const { x, y, w } = getHotspotBounds(hotspot);
+  const centerX = x + w / 2;
+  const clampedX = Math.max(22, Math.min(78, centerX));
+  const clampedTop = Math.max(4, y - 10);
+  rightWallBubble.style.left = `${clampedX}%`;
+  rightWallBubble.style.top = `${clampedTop}%`;
+}
+
+function showRightWallMessage(hotspot) {
+  if (!rightWallBubble) return;
+  positionRightWallBubble(hotspot);
+  rightWallBubble.classList.add("is-visible");
+  if (rightBubbleTimerId) {
+    clearTimeout(rightBubbleTimerId);
+  }
+  rightBubbleTimerId = setTimeout(() => {
+    rightWallBubble.classList.remove("is-visible");
+    rightBubbleTimerId = null;
+  }, 2600);
+}
+
+function findWordHotspotAtPoint(wall, hotspots, clientX, clientY) {
+  if (!wall || !hotspots.length) return null;
+  const rect = wall.getBoundingClientRect();
   if (rect.width <= 0 || rect.height <= 0) return null;
   if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
     return null;
@@ -127,7 +154,7 @@ function findLeftWordHotspotAtPoint(clientX, clientY) {
   const yPct = ((clientY - rect.top) / rect.height) * 100;
 
   return (
-    Array.from(leftWallHotspots).find((hotspot) => {
+    Array.from(hotspots).find((hotspot) => {
       const { x, y, w, h } = getHotspotBounds(hotspot);
       return xPct >= x && xPct <= x + w && yPct >= y && yPct <= y + h;
     }) || null
@@ -156,14 +183,34 @@ leftWallHotspots.forEach((hotspot) => {
   });
 });
 
+rightWallHotspots.forEach((hotspot) => {
+  hotspot.addEventListener("pointerup", (event) => {
+    event.preventDefault();
+    showRightWallMessage(hotspot);
+  });
+  hotspot.addEventListener("click", (event) => {
+    event.preventDefault();
+    showRightWallMessage(hotspot);
+  });
+});
+
 if (scene) {
   scene.addEventListener("click", (event) => {
-    if (views[currentViewIndex] !== "left") return;
     if (event.target.closest(".arrow-controls")) return;
     if (event.target.closest(".hotspot-door")) return;
-    const hotspot = findLeftWordHotspotAtPoint(event.clientX, event.clientY);
-    if (hotspot) {
-      showLeftWallMessage(hotspot);
+    const activeView = views[currentViewIndex];
+    if (activeView === "left") {
+      const leftHotspot = findWordHotspotAtPoint(leftWall, leftWallHotspots, event.clientX, event.clientY);
+      if (leftHotspot) {
+        showLeftWallMessage(leftHotspot);
+      }
+      return;
+    }
+    if (activeView === "right") {
+      const rightHotspot = findWordHotspotAtPoint(rightWall, rightWallHotspots, event.clientX, event.clientY);
+      if (rightHotspot) {
+        showRightWallMessage(rightHotspot);
+      }
     }
   });
 }

@@ -2,7 +2,7 @@
   --bg-top: #151515;
   --bg-bottom: #090909;
   --scene-w: 100vw;
-  --scene-h: 80vh;
+  --scene-h: 100vh;
   --wall-aspect: 1.0965;
   --wall-size: calc(var(--scene-h) * var(--wall-aspect));
   --wall-height: var(--scene-h);
@@ -32,14 +32,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 2vh;
+  padding-top: 0;
 }
 
 .scene {
   position: relative;
   width: var(--scene-w);
   height: var(--scene-h);
-  margin-bottom: 22vh;
+  margin-bottom: 0;
   perspective: var(--scene-perspective);
   perspective-origin: 50% 50%;
   overflow: hidden;
@@ -103,7 +103,8 @@ body {
   outline-offset: 2px;
 }
 
-.hotspot-word {
+.hotspot-word,
+.hotspot-cancer {
   position: absolute;
   left: var(--x);
   top: var(--y);
@@ -119,7 +120,8 @@ body {
   transform: translateZ(2px);
 }
 
-.hotspot-word:focus-visible {
+.hotspot-word:focus-visible,
+.hotspot-cancer:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.9);
   outline-offset: 1px;
 }
@@ -192,6 +194,12 @@ body {
   max-width: 62%;
 }
 
+.right-bubble {
+  left: 50%;
+  top: 22%;
+  max-width: 62%;
+}
+
 .wall-front {
   transform: translateZ(calc(var(--depth) * -1));
 }
@@ -207,7 +215,7 @@ body {
 .arrow-controls {
   position: fixed;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) + 0.9rem);
+  bottom: calc(env(safe-area-inset-bottom) - 0.5rem);
   transform: translateX(-50%) perspective(600px) rotateX(38deg);
   display: flex;
   gap: calc(var(--arrow-size) * 4);
@@ -263,6 +271,6 @@ body {
   }
 
   .arrow-controls {
-    bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+    bottom: calc(env(safe-area-inset-bottom) - 0.35rem);
   }
 }
