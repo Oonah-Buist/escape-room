@@ -212,7 +212,6 @@ body {
   display: flex;
   gap: calc(var(--arrow-size) * 4);
   z-index: 30;
-  pointer-events: auto;
 }
 
 .arrow {
@@ -225,8 +224,6 @@ body {
   filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45));
   transition: transform 220ms ease, filter 220ms ease, opacity 220ms ease;
   opacity: 0.84;
-  pointer-events: auto;
-  touch-action: manipulation;
 }
 
 .arrow:hover,
