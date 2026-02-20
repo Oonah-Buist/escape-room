@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escape Room View</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="experience">
+    <div class="scene" aria-label="3D room view">
+      <div class="room" id="room">
+        <figure class="wall wall-front">
+          <img src="Assets/FrontWall.webp" alt="Front wall">
+        </figure>
+        <figure class="wall wall-left">
+          <img src="Assets/LeftWall.webp" alt="Left wall">
+        </figure>
+        <figure class="wall wall-right">
+          <img src="Assets/RightWall.webp" alt="Right wall">
+        </figure>
+      </div>
+      <nav class="arrow-controls" aria-label="Choose room direction">
+        <button class="arrow arrow-left" data-view="left" aria-label="Face left wall"></button>
+        <button class="arrow arrow-front is-active" data-view="front" aria-label="Face front wall"></button>
+        <button class="arrow arrow-right" data-view="right" aria-label="Face right wall"></button>
+      </nav>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
