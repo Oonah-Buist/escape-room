@@ -11,6 +11,7 @@
   --scene-perspective: 1900px;
   --orange-dark: #b65414;
   --orange-dark-hover: #cf6c22;
+  --arrow-size: 72px;
 }
 
 * {
@@ -38,7 +39,7 @@ body {
   position: relative;
   width: var(--scene-w);
   height: var(--scene-h);
-  margin-bottom: 18vh;
+  margin-bottom: 22vh;
   perspective: var(--scene-perspective);
   perspective-origin: 50% 50%;
   overflow: hidden;
@@ -86,6 +87,111 @@ body {
   object-fit: cover;
 }
 
+.hotspot-donate {
+  position: absolute;
+  left: 35%;
+  top: 6.2%;
+  width: 30%;
+  height: 10.2%;
+  z-index: 5;
+  display: block;
+  cursor: pointer;
+}
+
+.hotspot-donate:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 2px;
+}
+
+.hotspot-word {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  z-index: 6;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.001);
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateZ(2px);
+}
+
+.hotspot-word:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 1px;
+}
+
+.hotspot-door {
+  position: absolute;
+  left: 31%;
+  top: 30%;
+  width: 38%;
+  height: 69%;
+  z-index: 6;
+  display: block;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hotspot-door:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 2px;
+}
+
+.speech-bubble {
+  position: absolute;
+  transform: translate(-50%, 0.8rem);
+  padding: 0.65rem 0.9rem;
+  background: rgba(255, 252, 238, 0.96);
+  color: #2b1c0f;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(86, 64, 43, 0.45);
+  font-size: 0.95rem;
+  line-height: 1.25;
+  text-align: center;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.48rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  background: rgba(255, 252, 238, 0.96);
+  border-right: 1px solid rgba(86, 64, 43, 0.45);
+  border-bottom: 1px solid rgba(86, 64, 43, 0.45);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.speech-bubble.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.door-bubble {
+  left: 50%;
+  top: 22%;
+  max-width: 62%;
+}
+
+.left-bubble {
+  left: 50%;
+  top: 22%;
+  max-width: 62%;
+}
+
 .wall-front {
   transform: translateZ(calc(var(--depth) * -1));
 }
@@ -101,16 +207,17 @@ body {
 .arrow-controls {
   position: fixed;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) - 0.9rem);
+  bottom: calc(env(safe-area-inset-bottom) + 0.9rem);
   transform: translateX(-50%) perspective(600px) rotateX(38deg);
   display: flex;
-  gap: 1.2rem;
+  gap: calc(var(--arrow-size) * 4);
   z-index: 30;
+  pointer-events: auto;
 }
 
 .arrow {
-  width: 72px;
-  height: 72px;
+  width: var(--arrow-size);
+  height: var(--arrow-size);
   border: none;
   cursor: pointer;
   background: linear-gradient(180deg, var(--orange-dark-hover), var(--orange-dark));
@@ -118,6 +225,8 @@ body {
   filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45));
   transition: transform 220ms ease, filter 220ms ease, opacity 220ms ease;
   opacity: 0.84;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 .arrow:hover,
@@ -152,13 +261,11 @@ body {
 }
 
 @media (max-width: 820px) {
-  .arrow-controls {
-    bottom: calc(env(safe-area-inset-bottom) - 0.7rem);
-    gap: 0.8rem;
+  :root {
+    --arrow-size: 62px;
   }
 
-  .arrow {
-    width: 62px;
-    height: 62px;
+  .arrow-controls {
+    bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
   }
 }
