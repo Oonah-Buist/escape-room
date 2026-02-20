@@ -8,6 +8,8 @@ const leftWallBubble = document.getElementById("leftWallBubble");
 const leftWall = document.querySelector(".wall-left");
 const windowHotspot = document.querySelector(".hotspot-window");
 const windowModal = document.getElementById("windowModal");
+const curtainHotspot = document.querySelector(".hotspot-curtain");
+const curtainModal = document.getElementById("curtainModal");
 const rightWallHotspots = document.querySelectorAll(".hotspot-cancer");
 const rightWallBubble = document.getElementById("rightWallBubble");
 const rightWall = document.querySelector(".wall-right");
@@ -25,6 +27,7 @@ let leftBubbleTimerId = null;
 let rightBubbleTimerId = null;
 let audioContext = null;
 let windowOpenedAt = 0;
+let curtainOpenedAt = 0;
 
 function renderView() {
   const view = views[currentViewIndex];
@@ -139,6 +142,20 @@ function closeWindowModal() {
   windowModal.setAttribute("aria-hidden", "true");
 }
 
+function openCurtainModal() {
+  if (!curtainModal) return;
+  curtainOpenedAt = Date.now();
+  curtainModal.classList.add("is-open");
+  curtainModal.setAttribute("aria-hidden", "false");
+  playSparkle();
+}
+
+function closeCurtainModal() {
+  if (!curtainModal) return;
+  curtainModal.classList.remove("is-open");
+  curtainModal.setAttribute("aria-hidden", "true");
+}
+
 function getHotspotBounds(hotspot) {
   const x = parseFloat(hotspot.style.getPropertyValue("--x"));
   const y = parseFloat(hotspot.style.getPropertyValue("--y"));
@@ -235,6 +252,29 @@ function pointInWindowRegion(clientX, clientY) {
   );
 }
 
+function pointInCurtainRegion(clientX, clientY) {
+  if (!rightWall) return false;
+  const rect = rightWall.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+    return false;
+  }
+
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  const yPct = ((clientY - rect.top) / rect.height) * 100;
+
+  const curtainX = 62;
+  const curtainY = 0;
+  const curtainW = 38;
+  const curtainH = 100;
+  return (
+    xPct >= curtainX &&
+    xPct <= curtainX + curtainW &&
+    yPct >= curtainY &&
+    yPct <= curtainY + curtainH
+  );
+}
+
 controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
 });
@@ -248,6 +288,15 @@ if (windowHotspot) {
   windowHotspot.addEventListener("click", onWindowActivate);
 }
 
+if (curtainHotspot) {
+  const onCurtainActivate = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openCurtainModal();
+  };
+  curtainHotspot.addEventListener("click", onCurtainActivate);
+}
+
 if (windowModal) {
   windowModal.addEventListener("click", (event) => {
     if (Date.now() - windowOpenedAt < 250) return;
@@ -257,9 +306,19 @@ if (windowModal) {
   });
 }
 
+if (curtainModal) {
+  curtainModal.addEventListener("click", (event) => {
+    if (Date.now() - curtainOpenedAt < 250) return;
+    if (event.target === curtainModal) {
+      closeCurtainModal();
+    }
+  });
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeWindowModal();
+    closeCurtainModal();
   }
 });
 
@@ -297,6 +356,7 @@ if (scene) {
     if (event.target.closest(".arrow-controls")) return;
     if (event.target.closest(".hotspot-door")) return;
     if (event.target.closest(".hotspot-window")) return;
+    if (event.target.closest(".hotspot-curtain")) return;
     const activeView = views[currentViewIndex];
     if (activeView === "left") {
       if (pointInWindowRegion(event.clientX, event.clientY)) {
@@ -310,6 +370,10 @@ if (scene) {
       return;
     }
     if (activeView === "right") {
+      if (pointInCurtainRegion(event.clientX, event.clientY)) {
+        openCurtainModal();
+        return;
+      }
       const rightHotspot = findWordHotspotAtPoint(rightWall, rightWallHotspots, event.clientX, event.clientY);
       if (rightHotspot) {
         showRightWallMessage(rightHotspot);

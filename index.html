@@ -51,6 +51,7 @@
         </figure>
         <figure class="wall wall-right">
           <img src="Assets/RightWall.webp" alt="Right wall">
+          <button class="hotspot-curtain" type="button" aria-label="Open curtain document"></button>
           <button class="hotspot-cancer" type="button" aria-label="Medulloblastoma" style="--x: 18%; --y: 2.2%; --w: 48%; --h: 6.6%;"></button>
           <button class="hotspot-cancer" type="button" aria-label="Ewing Sarcoma" style="--x: 4.5%; --y: 12.6%; --w: 18.5%; --h: 7.7%;"></button>
           <button class="hotspot-cancer" type="button" aria-label="Liposarcoma" style="--x: 28.5%; --y: 12.6%; --w: 32.5%; --h: 7.7%;"></button>
@@ -85,6 +86,11 @@
   <div class="window-modal" id="windowModal" aria-hidden="true">
     <div class="window-modal-panel" role="dialog" aria-modal="true" aria-label="Window document">
       <img class="window-image" src="Assets/Window.png" alt="Window image">
+    </div>
+  </div>
+  <div class="window-modal" id="curtainModal" aria-hidden="true">
+    <div class="window-modal-panel" role="dialog" aria-modal="true" aria-label="Curtain document">
+      <iframe class="modal-pdf" src="Assets/Curtain.pdf#zoom=200" title="Curtain PDF"></iframe>
     </div>
   </div>
   <script src="script.js"></script>
