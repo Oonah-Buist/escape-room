@@ -3,6 +3,7 @@ const scene = document.querySelector(".scene");
 const controls = document.querySelectorAll(".arrow");
 const doorHotspot = document.querySelector(".hotspot-door");
 const switchHotspot = document.querySelector(".hotspot-switch");
+const bookHotspot = document.querySelector(".hotspot-book");
 const doorBubble = document.getElementById("doorBubble");
 const frontWall = document.querySelector(".wall-front");
 const leftWallHotspots = document.querySelectorAll(".hotspot-word");
@@ -13,6 +14,7 @@ const windowModal = document.getElementById("windowModal");
 const curtainHotspot = document.querySelector(".hotspot-curtain");
 const curtainModal = document.getElementById("curtainModal");
 const switchModal = document.getElementById("switchModal");
+const bookModal = document.getElementById("bookModal");
 const rightWallHotspots = document.querySelectorAll(".hotspot-cancer");
 const rightWallBubble = document.getElementById("rightWallBubble");
 const rightWall = document.querySelector(".wall-right");
@@ -32,6 +34,7 @@ let audioContext = null;
 let windowOpenedAt = 0;
 let curtainOpenedAt = 0;
 let switchOpenedAt = 0;
+let bookOpenedAt = 0;
 
 function renderView() {
   const view = views[currentViewIndex];
@@ -172,6 +175,20 @@ function closeSwitchModal() {
   if (!switchModal) return;
   switchModal.classList.remove("is-open");
   switchModal.setAttribute("aria-hidden", "true");
+}
+
+function openBookModal() {
+  if (!bookModal) return;
+  bookOpenedAt = Date.now();
+  bookModal.classList.add("is-open");
+  bookModal.setAttribute("aria-hidden", "false");
+  playSparkle();
+}
+
+function closeBookModal() {
+  if (!bookModal) return;
+  bookModal.classList.remove("is-open");
+  bookModal.setAttribute("aria-hidden", "true");
 }
 
 function getHotspotBounds(hotspot) {
@@ -316,6 +333,29 @@ function pointInSwitchRegion(clientX, clientY) {
   );
 }
 
+function pointInBookRegion(clientX, clientY) {
+  if (!frontWall) return false;
+  const rect = frontWall.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+    return false;
+  }
+
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  const yPct = ((clientY - rect.top) / rect.height) * 100;
+
+  const bookX = 70.5;
+  const bookY = 62.5;
+  const bookW = 15;
+  const bookH = 19;
+  return (
+    xPct >= bookX &&
+    xPct <= bookX + bookW &&
+    yPct >= bookY &&
+    yPct <= bookY + bookH
+  );
+}
+
 controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
 });
@@ -348,6 +388,16 @@ if (switchHotspot) {
   switchHotspot.addEventListener("click", onSwitchActivate);
 }
 
+if (bookHotspot) {
+  const onBookActivate = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openBookModal();
+  };
+  bookHotspot.addEventListener("pointerup", onBookActivate);
+  bookHotspot.addEventListener("click", onBookActivate);
+}
+
 if (windowModal) {
   windowModal.addEventListener("click", (event) => {
     if (Date.now() - windowOpenedAt < 250) return;
@@ -375,11 +425,21 @@ if (switchModal) {
   });
 }
 
+if (bookModal) {
+  bookModal.addEventListener("click", (event) => {
+    if (Date.now() - bookOpenedAt < 250) return;
+    if (event.target === bookModal) {
+      closeBookModal();
+    }
+  });
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeWindowModal();
     closeCurtainModal();
     closeSwitchModal();
+    closeBookModal();
   }
 });
 
@@ -420,12 +480,17 @@ if (scene) {
         openSwitchModal();
         return;
       }
+      if (pointInBookRegion(event.clientX, event.clientY)) {
+        openBookModal();
+        return;
+      }
     }
     if (event.target.closest(".arrow-controls")) return;
     if (event.target.closest(".hotspot-door")) return;
     if (event.target.closest(".hotspot-window")) return;
     if (event.target.closest(".hotspot-curtain")) return;
     if (event.target.closest(".hotspot-switch")) return;
+    if (event.target.closest(".hotspot-book")) return;
     if (activeView === "left") {
       if (pointInWindowRegion(event.clientX, event.clientY)) {
         openWindowModal();

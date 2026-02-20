@@ -165,6 +165,21 @@ body {
   pointer-events: auto;
 }
 
+.hotspot-book {
+  position: absolute;
+  left: 70.5%;
+  top: 62.5%;
+  width: 15%;
+  height: 19%;
+  z-index: 7;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.001);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 .hotspot-window:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.9);
   outline-offset: 1px;
@@ -176,6 +191,11 @@ body {
 }
 
 .hotspot-switch:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 1px;
+}
+
+.hotspot-book:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.9);
   outline-offset: 1px;
 }
