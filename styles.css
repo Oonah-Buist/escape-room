@@ -180,6 +180,21 @@ body {
   pointer-events: auto;
 }
 
+.hotspot-bottle {
+  position: absolute;
+  left: 14.5%;
+  top: 62%;
+  width: 15%;
+  height: 19.5%;
+  z-index: 7;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.001);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 .hotspot-window:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.9);
   outline-offset: 1px;
@@ -196,6 +211,11 @@ body {
 }
 
 .hotspot-book:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 1px;
+}
+
+.hotspot-bottle:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.9);
   outline-offset: 1px;
 }
