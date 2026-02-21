@@ -20,6 +20,9 @@ const bottleModal = document.getElementById("bottleModal");
 const rightWallHotspots = document.querySelectorAll(".hotspot-cancer");
 const rightWallBubble = document.getElementById("rightWallBubble");
 const rightWall = document.querySelector(".wall-right");
+const backgroundMusic = document.getElementById("bgMusic");
+const soundToggle = document.getElementById("soundToggle");
+const soundVolume = document.getElementById("soundVolume");
 
 const views = ["left", "front", "right"];
 const viewAngles = {
@@ -38,6 +41,40 @@ let curtainOpenedAt = 0;
 let switchOpenedAt = 0;
 let bookOpenedAt = 0;
 let bottleOpenedAt = 0;
+let soundEnabled = true;
+let soundVolumeLevel = 0.7;
+const baseMusicVolume = 0.08;
+
+function tryPlayBackgroundMusic() {
+  if (!backgroundMusic || !soundEnabled) return;
+  const playPromise = backgroundMusic.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(() => {});
+  }
+}
+
+function applySoundState() {
+  if (soundToggle) {
+    soundToggle.classList.toggle("is-muted", !soundEnabled);
+    soundToggle.setAttribute("aria-pressed", String(!soundEnabled));
+    soundToggle.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
+    soundToggle.title = soundEnabled ? "Sound on" : "Sound off";
+  }
+
+  if (soundVolume) {
+    soundVolume.value = String(Math.round(soundVolumeLevel * 100));
+  }
+
+  if (!backgroundMusic) return;
+  backgroundMusic.volume = baseMusicVolume * soundVolumeLevel;
+  if (soundEnabled) {
+    backgroundMusic.muted = false;
+    tryPlayBackgroundMusic();
+  } else {
+    backgroundMusic.muted = true;
+    backgroundMusic.pause();
+  }
+}
 
 function renderView() {
   const view = views[currentViewIndex];
@@ -60,6 +97,7 @@ function getAudioContext() {
 }
 
 function playBuzzer() {
+  if (!soundEnabled) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -69,30 +107,45 @@ function playBuzzer() {
 
   const now = ctx.currentTime;
   const notes = [
-    { start: 0, from: 190, to: 158, duration: 0.16, level: 0.12 },
-    { start: 0.22, from: 150, to: 120, duration: 0.19, level: 0.14 },
+    { start: 0, freq: 1318.5, duration: 0.12, level: 0.05 },
+    { start: 0.09, freq: 1568, duration: 0.12, level: 0.045 },
+    { start: 0.18, freq: 1975.5, duration: 0.2, level: 0.04 },
   ];
 
   notes.forEach((note) => {
+    const noteLevel = note.level * soundVolumeLevel;
+    if (noteLevel <= 0) return;
     const t0 = now + note.start;
     const t1 = t0 + note.duration;
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.exponentialRampToValueAtTime(note.level, t0 + 0.015);
+    gain.gain.exponentialRampToValueAtTime(noteLevel, t0 + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, t1);
     gain.connect(ctx.destination);
 
     const osc = ctx.createOscillator();
-    osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(note.from, t0);
-    osc.frequency.exponentialRampToValueAtTime(note.to, t1);
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(note.freq, t0);
     osc.connect(gain);
     osc.start(t0);
     osc.stop(t1 + 0.01);
+
+    const shimmer = ctx.createOscillator();
+    shimmer.type = "sine";
+    shimmer.frequency.setValueAtTime(note.freq * 2, t0);
+    const shimmerGain = ctx.createGain();
+    shimmerGain.gain.setValueAtTime(0.0001, t0);
+    shimmerGain.gain.exponentialRampToValueAtTime(noteLevel * 0.32, t0 + 0.01);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.0001, t1);
+    shimmer.connect(shimmerGain);
+    shimmerGain.connect(ctx.destination);
+    shimmer.start(t0);
+    shimmer.stop(t1 + 0.01);
   });
 }
 
 function playSparkle() {
+  if (!soundEnabled) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -108,11 +161,13 @@ function playSparkle() {
   ];
 
   notes.forEach((note) => {
+    const noteLevel = note.level * soundVolumeLevel;
+    if (noteLevel <= 0) return;
     const t0 = now + note.start;
     const t1 = t0 + note.duration;
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.exponentialRampToValueAtTime(note.level, t0 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(noteLevel, t0 + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, t1);
     gain.connect(ctx.destination);
 
@@ -143,7 +198,6 @@ function openWindowModal() {
   windowOpenedAt = Date.now();
   windowModal.classList.add("is-open");
   windowModal.setAttribute("aria-hidden", "false");
-  playSparkle();
 }
 
 function closeWindowModal() {
@@ -157,7 +211,6 @@ function openCurtainModal() {
   curtainOpenedAt = Date.now();
   curtainModal.classList.add("is-open");
   curtainModal.setAttribute("aria-hidden", "false");
-  playSparkle();
 }
 
 function closeCurtainModal() {
@@ -171,7 +224,6 @@ function openSwitchModal() {
   switchOpenedAt = Date.now();
   switchModal.classList.add("is-open");
   switchModal.setAttribute("aria-hidden", "false");
-  playSparkle();
 }
 
 function closeSwitchModal() {
@@ -185,7 +237,6 @@ function openBookModal() {
   bookOpenedAt = Date.now();
   bookModal.classList.add("is-open");
   bookModal.setAttribute("aria-hidden", "false");
-  playSparkle();
 }
 
 function closeBookModal() {
@@ -199,7 +250,6 @@ function openBottleModal() {
   bottleOpenedAt = Date.now();
   bottleModal.classList.add("is-open");
   bottleModal.setAttribute("aria-hidden", "false");
-  playSparkle();
 }
 
 function closeBottleModal() {
@@ -400,6 +450,49 @@ controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
 });
 
+if (soundToggle) {
+  soundToggle.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    soundEnabled = !soundEnabled;
+    applySoundState();
+  });
+}
+
+if (soundVolume) {
+  soundVolume.addEventListener("input", (event) => {
+    event.stopPropagation();
+    const rawValue = Number(event.target.value);
+    if (!Number.isFinite(rawValue)) return;
+    soundVolumeLevel = Math.max(0, Math.min(1, rawValue / 100));
+    if (backgroundMusic) {
+      backgroundMusic.volume = baseMusicVolume * soundVolumeLevel;
+    }
+  });
+}
+
+if (backgroundMusic) {
+  if (soundVolume) {
+    const rawValue = Number(soundVolume.value);
+    if (Number.isFinite(rawValue)) {
+      soundVolumeLevel = Math.max(0, Math.min(1, rawValue / 100));
+    }
+  }
+  applySoundState();
+
+  const onFirstInteraction = () => {
+    tryPlayBackgroundMusic();
+  };
+
+  document.addEventListener("pointerdown", onFirstInteraction, { once: true });
+  document.addEventListener("keydown", onFirstInteraction, { once: true });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && backgroundMusic.paused) {
+      tryPlayBackgroundMusic();
+    }
+  });
+}
+
 if (windowHotspot) {
   const onWindowActivate = (event) => {
     event.preventDefault();
@@ -556,14 +649,17 @@ if (scene) {
     if (event.target.closest(".hotspot-switch")) return;
     if (event.target.closest(".hotspot-book")) return;
     if (event.target.closest(".hotspot-bottle")) return;
+    if (event.target.closest(".sound-controls")) return;
+    if (event.target.closest(".sound-toggle")) return;
     if (activeView === "left") {
-      if (pointInWindowRegion(event.clientX, event.clientY)) {
-        openWindowModal();
-        return;
-      }
       const leftHotspot = findWordHotspotAtPoint(leftWall, leftWallHotspots, event.clientX, event.clientY);
       if (leftHotspot) {
         showLeftWallMessage(leftHotspot);
+        return;
+      }
+      if (pointInWindowRegion(event.clientX, event.clientY)) {
+        openWindowModal();
+        return;
       }
       return;
     }

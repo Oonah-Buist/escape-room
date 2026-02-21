@@ -28,7 +28,7 @@
             aria-label="Donate to Childhood Cancer Research Trust"
           ></a>
           <div class="speech-bubble door-bubble" id="doorBubble" role="status" aria-live="polite">
-            We need to raise over £25,000 to open this door!
+            With £25,000 we can pass through this door.
           </div>
         </figure>
         <figure class="wall wall-left">
@@ -44,10 +44,10 @@
           <button class="hotspot-word" type="button" aria-label="Cancer" style="--x: 54.4%; --y: 30.0%; --w: 20.3%; --h: 8.0%;"></button>
           <button class="hotspot-word" type="button" aria-label="Alzheimer's" style="--x: 3.8%; --y: 43.9%; --w: 30.4%; --h: 7.7%;"></button>
           <button class="hotspot-word" type="button" aria-label="Parkinson's" style="--x: 69%; --y: 43.9%; --w: 27.8%; --h: 7.7%;"></button>
-          <button class="hotspot-word" type="button" aria-label="Multiple Sclerosis" style="--x: 3.9%; --y: 51.6%; --w: 26.1%; --h: 8.2%;"></button>
-          <button class="hotspot-word" type="button" aria-label="Metabolic Syndrome" style="--x: 69.9%; --y: 51.6%; --w: 25.9%; --h: 8.2%;"></button>
-          <button class="hotspot-word" type="button" aria-label="Type 2 Diabetes" style="--x: 8.5%; --y: 71.3%; --w: 24.5%; --h: 9.2%;"></button>
-          <button class="hotspot-word" type="button" aria-label="Cardiac Hypertrophy" style="--x: 70%; --y: 71.3%; --w: 28%; --h: 9.2%;"></button>
+          <button class="hotspot-word" type="button" aria-label="Multiple Sclerosis" style="--x: 2.4%; --y: 50.1%; --w: 30.6%; --h: 12.8%;"></button>
+          <button class="hotspot-word" type="button" aria-label="Metabolic Syndrome" style="--x: 68.9%; --y: 50.8%; --w: 28.1%; --h: 11.6%;"></button>
+          <button class="hotspot-word" type="button" aria-label="Type 2 Diabetes" style="--x: 7.6%; --y: 70.5%; --w: 26.4%; --h: 12.3%;"></button>
+          <button class="hotspot-word" type="button" aria-label="Cardiac Hypertrophy" style="--x: 69%; --y: 70.5%; --w: 30.2%; --h: 12.2%;"></button>
           <div class="speech-bubble left-bubble" id="leftWallBubble" role="status" aria-live="polite">
             This condition has<br>PPARy involvement
           </div>
@@ -84,6 +84,43 @@
         <button class="arrow arrow-left" data-turn="left" aria-label="Turn left"></button>
         <button class="arrow arrow-right" data-turn="right" aria-label="Turn right"></button>
       </nav>
+      <div class="sound-controls" aria-label="Sound controls">
+        <button
+          id="soundToggle"
+          class="sound-toggle"
+          type="button"
+          aria-label="Turn sound off"
+          aria-pressed="false"
+          title="Sound on"
+        >
+          <svg class="sound-toggle-icon icon-on" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="9" y="3" width="6" height="10" rx="3"></rect>
+            <path d="M6 10a6 6 0 0 0 12 0"></path>
+            <line x1="12" y1="16" x2="12" y2="21"></line>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+          </svg>
+          <svg class="sound-toggle-icon icon-off" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="9" y="3" width="6" height="10" rx="3"></rect>
+            <path d="M6 10a6 6 0 0 0 12 0"></path>
+            <line x1="12" y1="16" x2="12" y2="21"></line>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="4" y1="4" x2="20" y2="20"></line>
+          </svg>
+        </button>
+        <label class="sound-volume-wrap" for="soundVolume">
+          <span class="sound-volume-label">Vol</span>
+          <input
+            id="soundVolume"
+            class="sound-volume"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="70"
+            aria-label="Sound volume"
+          >
+        </label>
+      </div>
     </div>
   </main>
   <div class="window-modal" id="windowModal" aria-hidden="true">
@@ -111,6 +148,13 @@
       <iframe class="modal-pdf" src="Assets/Bottle.pdf#zoom=200" title="Bottle PDF"></iframe>
     </div>
   </div>
+  <audio
+    id="bgMusic"
+    src="Assets/Dvorak - Songs My Mother Taught Me.mp3"
+    preload="auto"
+    loop
+    aria-hidden="true"
+  ></audio>
   <script src="script.js"></script>
 </body>
 </html>
