@@ -315,9 +315,9 @@ function pointInCurtainRegion(clientX, clientY) {
   const xPct = ((clientX - rect.left) / rect.width) * 100;
   const yPct = ((clientY - rect.top) / rect.height) * 100;
 
-  const curtainX = 62;
+  const curtainX = 74;
   const curtainY = 0;
-  const curtainW = 38;
+  const curtainW = 26;
   const curtainH = 100;
   return (
     xPct >= curtainX &&
