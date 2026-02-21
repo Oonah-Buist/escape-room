@@ -23,6 +23,8 @@ const rightWall = document.querySelector(".wall-right");
 const backgroundMusic = document.getElementById("bgMusic");
 const soundToggle = document.getElementById("soundToggle");
 const soundVolume = document.getElementById("soundVolume");
+const modalCloseButtons = document.querySelectorAll(".modal-close");
+const modalActionButtons = document.querySelectorAll(".modal-action");
 
 const views = ["left", "front", "right"];
 const viewAngles = {
@@ -84,6 +86,13 @@ function renderView() {
 function turn(direction) {
   const delta = direction === "right" ? 1 : -1;
   currentViewIndex = (currentViewIndex + delta + views.length) % views.length;
+  renderView();
+}
+
+function goToView(viewName) {
+  const nextIndex = views.indexOf(viewName);
+  if (nextIndex === -1) return;
+  currentViewIndex = nextIndex;
   renderView();
 }
 
@@ -256,6 +265,58 @@ function closeBottleModal() {
   if (!bottleModal) return;
   bottleModal.classList.remove("is-open");
   bottleModal.setAttribute("aria-hidden", "true");
+}
+
+function closeModalByElement(modalElement) {
+  if (!modalElement) return;
+  if (modalElement === windowModal) {
+    closeWindowModal();
+    return;
+  }
+  if (modalElement === curtainModal) {
+    closeCurtainModal();
+    return;
+  }
+  if (modalElement === switchModal) {
+    closeSwitchModal();
+    return;
+  }
+  if (modalElement === bookModal) {
+    closeBookModal();
+    return;
+  }
+  if (modalElement === bottleModal) {
+    closeBottleModal();
+  }
+}
+
+function savePdf(pdfPath) {
+  if (!pdfPath) return;
+  const link = document.createElement("a");
+  link.href = pdfPath;
+  const fileName = pdfPath.split("/").pop() || "document.pdf";
+  link.download = decodeURIComponent(fileName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function printPdf(pdfPath) {
+  if (!pdfPath) return;
+  const printUrl = `${pdfPath}#toolbar=0&navpanes=0&scrollbar=1`;
+  const printWindow = window.open(printUrl, "_blank");
+  if (!printWindow) return;
+
+  const tryPrint = () => {
+    try {
+      printWindow.focus();
+      printWindow.print();
+    } catch (_) {
+      // Ignore print failures from browser restrictions.
+    }
+  };
+
+  setTimeout(tryPrint, 1100);
 }
 
 function getHotspotBounds(hotspot) {
@@ -446,6 +507,33 @@ function pointInBottleRegion(clientX, clientY) {
   );
 }
 
+function pointInElementRect(element, clientX, clientY) {
+  if (!element) return false;
+  const rect = element.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  return clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
+}
+
+function pointInFrontSliverFromLeftView(clientX, clientY) {
+  if (pointInElementRect(frontWall, clientX, clientY)) return true;
+  if (!scene) return false;
+  const rect = scene.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  return xPct >= 82;
+}
+
+function pointInFrontSliverFromRightView(clientX, clientY) {
+  if (pointInElementRect(frontWall, clientX, clientY)) return true;
+  if (!scene) return false;
+  const rect = scene.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  return xPct <= 18;
+}
+
 controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
 });
@@ -470,6 +558,30 @@ if (soundVolume) {
     }
   });
 }
+
+modalCloseButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    closeModalByElement(button.closest(".window-modal"));
+  });
+});
+
+modalActionButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const action = button.dataset.action;
+    const pdfPath = button.dataset.pdf;
+    if (action === "save") {
+      savePdf(pdfPath);
+      return;
+    }
+    if (action === "print") {
+      printPdf(pdfPath);
+    }
+  });
+});
 
 if (backgroundMusic) {
   if (soundVolume) {
@@ -641,6 +753,14 @@ if (scene) {
         openBottleModal();
         return;
       }
+      if (event.target.closest(".wall-left")) {
+        turn("left");
+        return;
+      }
+      if (event.target.closest(".wall-right")) {
+        turn("right");
+        return;
+      }
     }
     if (event.target.closest(".arrow-controls")) return;
     if (event.target.closest(".hotspot-door")) return;
@@ -651,6 +771,14 @@ if (scene) {
     if (event.target.closest(".hotspot-bottle")) return;
     if (event.target.closest(".sound-controls")) return;
     if (event.target.closest(".sound-toggle")) return;
+    if (activeView === "left" && pointInFrontSliverFromLeftView(event.clientX, event.clientY)) {
+      goToView("front");
+      return;
+    }
+    if (activeView === "right" && pointInFrontSliverFromRightView(event.clientX, event.clientY)) {
+      goToView("front");
+      return;
+    }
     if (activeView === "left") {
       const leftHotspot = findWordHotspotAtPoint(leftWall, leftWallHotspots, event.clientX, event.clientY);
       if (leftHotspot) {
