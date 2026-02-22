@@ -12,6 +12,8 @@
   --orange-dark: #b65414;
   --orange-dark-hover: #cf6c22;
   --arrow-size: 72px;
+  --wall-seam-strip-left: 96px;
+  --wall-seam-strip-right: 120px;
 }
 
 * {
@@ -313,7 +315,32 @@ body {
 }
 
 .wall-back {
-  transform: translateX(calc(var(--wall-size) * 0.035)) rotateY(180deg) translateZ(calc(var(--depth) * -1));
+  transform: rotateY(180deg) translateZ(calc(var(--depth) * -1));
+  overflow: visible;
+}
+
+.wall-back::before,
+.wall-back::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: var(--wall-seam-strip-left);
+  height: 100%;
+  background-image: url("Assets/Wall.webp");
+  background-repeat: no-repeat;
+  background-size: var(--wall-size) var(--wall-height);
+  pointer-events: none;
+}
+
+.wall-back::before {
+  left: calc(var(--wall-seam-strip-left) * -1);
+  background-position: left top;
+}
+
+.wall-back::after {
+  width: var(--wall-seam-strip-right);
+  right: calc(var(--wall-seam-strip-right) * -1);
+  background-position: right top;
 }
 
 .arrow-controls {
