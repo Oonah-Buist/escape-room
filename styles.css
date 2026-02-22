@@ -312,6 +312,10 @@ body {
   transform: rotateY(-90deg) translateZ(calc(var(--depth) * -1));
 }
 
+.wall-back {
+  transform: translateX(calc(var(--wall-size) * 0.035)) rotateY(180deg) translateZ(calc(var(--depth) * -1));
+}
+
 .arrow-controls {
   position: fixed;
   left: 50%;
