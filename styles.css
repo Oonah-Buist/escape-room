@@ -10,6 +10,8 @@
   --depth: calc(var(--wall-size) / 2);
   --camera-z: calc(var(--depth) * 0.68);
   --scene-perspective: 1900px;
+  --scene-perspective-origin-y: 50%;
+  --camera-tilt-x: 0deg;
   --orange-dark: #b65414;
   --orange-dark-hover: #cf6c22;
   --arrow-size: 72px;
@@ -50,7 +52,7 @@ body {
   height: var(--scene-h);
   margin-bottom: 0;
   perspective: var(--scene-perspective);
-  perspective-origin: 50% 50%;
+  perspective-origin: 50% var(--scene-perspective-origin-y);
   overflow: hidden;
   border-radius: 0;
   background:
@@ -168,7 +170,7 @@ body {
   left: 50%;
   top: 50%;
   transform-style: preserve-3d;
-  transform: translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateY(0deg);
+  transform: translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateX(var(--camera-tilt-x)) rotateY(0deg);
   transition: transform 1800ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
@@ -887,6 +889,8 @@ body {
     --wall-scale: 0.88;
     --scene-perspective: 1900px;
     --camera-z: calc(var(--depth) * 0.68);
+    --scene-perspective-origin-y: 62%;
+    --camera-tilt-x: 4deg;
   }
 
   .sound-controls {
@@ -926,6 +930,8 @@ body {
     --wall-scale: 0.84;
     --camera-z: calc(var(--depth) * 0.66);
     --scene-perspective: 1900px;
+    --scene-perspective-origin-y: 64%;
+    --camera-tilt-x: 4.8deg;
     --arrow-size: 58px;
   }
 

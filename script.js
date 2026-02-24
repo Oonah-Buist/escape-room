@@ -272,7 +272,7 @@ function showRightWallInfo(hotspot) {
 }
 
 function renderView() {
-  room.style.transform = `translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateY(${currentRotationDeg}deg)`;
+  room.style.transform = `translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateX(var(--camera-tilt-x)) rotateY(${currentRotationDeg}deg)`;
 }
 
 function turn(direction) {
