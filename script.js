@@ -35,6 +35,8 @@ const mobileOpenPdf = document.getElementById("mobileOpenPdf");
 const mobileModeQuery = window.matchMedia("(max-width: 900px), (pointer: coarse)");
 
 const views = ["left", "front", "right", "back"];
+const mobileViewSequence = ["front", "front", "right", "right", "back", "back", "left", "left"];
+const mobileHalfStepOffsetDeg = 22.5;
 const viewAngles = {
   left: -90,
   front: 0,
@@ -43,7 +45,8 @@ const viewAngles = {
 };
 
 let currentViewIndex = 1;
-let currentRotationDeg = viewAngles[views[currentViewIndex]];
+let currentRotationDeg = viewAngles.front;
+let mobileStepIndex = 0;
 let bubbleTimerId = null;
 let leftBubbleTimerId = null;
 let rightBubbleTimerId = null;
@@ -61,6 +64,61 @@ let mobilePopupOpenedAt = 0;
 let touchStartX = 0;
 let touchStartY = 0;
 let touchTracking = false;
+
+function normalizeAngle(angle) {
+  return ((angle % 360) + 360) % 360;
+}
+
+function getShortestDelta(currentNormalized, targetNormalized) {
+  let delta = ((targetNormalized - currentNormalized + 540) % 360) - 180;
+  if (delta === -180) delta = 180;
+  return delta;
+}
+
+function getViewCenterAngleNormalized(viewName) {
+  return normalizeAngle(viewAngles[viewName] || 0);
+}
+
+function getCurrentViewName() {
+  if (isMobileMode) {
+    return mobileViewSequence[mobileStepIndex];
+  }
+  return views[currentViewIndex];
+}
+
+function getMobileWallStartStep(viewName) {
+  return mobileViewSequence.indexOf(viewName);
+}
+
+function getMobileStepAngleNormalized(stepIndex) {
+  const normalizedStep = ((stepIndex % 8) + 8) % 8;
+  const stepView = mobileViewSequence[normalizedStep];
+  const center = getViewCenterAngleNormalized(stepView);
+  const offset = normalizedStep % 2 === 0 ? -mobileHalfStepOffsetDeg : mobileHalfStepOffsetDeg;
+  return normalizeAngle(center + offset);
+}
+
+function getClosestMobileTargetForView(viewName, currentAngle) {
+  const currentNormalized = normalizeAngle(currentAngle);
+  const wallStart = getMobileWallStartStep(viewName);
+  if (wallStart === -1) {
+    return { stepIndex: mobileStepIndex, angle: getMobileStepAngleNormalized(mobileStepIndex), delta: 0 };
+  }
+  const candidates = [
+    { stepIndex: wallStart, angle: getMobileStepAngleNormalized(wallStart) },
+    { stepIndex: wallStart + 1, angle: getMobileStepAngleNormalized(wallStart + 1) },
+  ];
+
+  let best = null;
+  candidates.forEach((candidate) => {
+    const delta = getShortestDelta(currentNormalized, candidate.angle);
+    if (!best || Math.abs(delta) < Math.abs(best.delta)) {
+      best = { ...candidate, delta };
+    }
+  });
+
+  return best;
+}
 
 function tryPlayBackgroundMusic() {
   if (!backgroundMusic || !soundEnabled) return;
@@ -168,8 +226,24 @@ function applyTapTargetSizing() {
 }
 
 function syncMobileMode() {
+  const wasMobile = isMobileMode;
   isMobileMode = mobileModeQuery.matches;
   document.body.classList.toggle("is-mobile-mode", isMobileMode);
+  const activeView = wasMobile ? mobileViewSequence[mobileStepIndex] : views[currentViewIndex];
+
+  if (isMobileMode) {
+    const target = getClosestMobileTargetForView(activeView, currentRotationDeg);
+    mobileStepIndex = target.stepIndex;
+    currentRotationDeg += target.delta;
+    currentViewIndex = views.indexOf(mobileViewSequence[mobileStepIndex]);
+  } else {
+    currentViewIndex = views.indexOf(activeView);
+    const normalizedCurrent = normalizeAngle(currentRotationDeg);
+    const normalizedTarget = getViewCenterAngleNormalized(activeView);
+    currentRotationDeg += getShortestDelta(normalizedCurrent, normalizedTarget);
+  }
+
+  renderView();
   applyTapTargetSizing();
 }
 
@@ -202,6 +276,17 @@ function renderView() {
 }
 
 function turn(direction) {
+  if (isMobileMode) {
+    const stepDelta = direction === "right" ? 1 : -1;
+    mobileStepIndex = ((mobileStepIndex + stepDelta) % 8 + 8) % 8;
+    const targetAngle = getMobileStepAngleNormalized(mobileStepIndex);
+    const normalizedCurrent = normalizeAngle(currentRotationDeg);
+    currentRotationDeg += getShortestDelta(normalizedCurrent, targetAngle);
+    currentViewIndex = views.indexOf(mobileViewSequence[mobileStepIndex]);
+    renderView();
+    return;
+  }
+
   const delta = direction === "right" ? 1 : -1;
   currentViewIndex = (currentViewIndex + delta + views.length) % views.length;
   currentRotationDeg += direction === "right" ? 90 : -90;
@@ -211,11 +296,19 @@ function turn(direction) {
 function goToView(viewName) {
   const nextIndex = views.indexOf(viewName);
   if (nextIndex === -1) return;
-  const normalizedCurrent = ((currentRotationDeg % 360) + 360) % 360;
-  const normalizedTarget = ((viewAngles[viewName] % 360) + 360) % 360;
-  let delta = ((normalizedTarget - normalizedCurrent + 540) % 360) - 180;
-  if (delta === -180) delta = 180;
-  currentRotationDeg += delta;
+  const normalizedCurrent = normalizeAngle(currentRotationDeg);
+
+  if (isMobileMode) {
+    const target = getClosestMobileTargetForView(viewName, currentRotationDeg);
+    mobileStepIndex = target.stepIndex;
+    currentRotationDeg += target.delta;
+    currentViewIndex = views.indexOf(mobileViewSequence[mobileStepIndex]);
+    renderView();
+    return;
+  }
+
+  const normalizedTarget = getViewCenterAngleNormalized(viewName);
+  currentRotationDeg += getShortestDelta(normalizedCurrent, normalizedTarget);
   currentViewIndex = nextIndex;
   renderView();
 }
@@ -1022,7 +1115,7 @@ rightWallHotspots.forEach((hotspot) => {
 if (scene) {
   scene.addEventListener("click", (event) => {
     if (isAnyPopupOpen()) return;
-    const activeView = views[currentViewIndex];
+    const activeView = getCurrentViewName();
     if (activeView === "front") {
       if (pointInSwitchRegion(event.clientX, event.clientY)) {
         openSwitchModal();
