@@ -36,7 +36,7 @@ const mobileModeQuery = window.matchMedia("(max-width: 900px), (pointer: coarse)
 
 const views = ["left", "front", "right", "back"];
 const mobileViewSequence = ["front", "front", "right", "right", "back", "back", "left", "left"];
-const mobileHalfStepOffsetDeg = 22.5;
+const mobileHalfStepOffsetDeg = 18;
 const viewAngles = {
   left: -90,
   front: 0,

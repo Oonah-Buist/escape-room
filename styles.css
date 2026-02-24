@@ -885,8 +885,8 @@ body {
   :root {
     --arrow-size: 62px;
     --wall-scale: 0.88;
-    --scene-perspective: 2050px;
-    --camera-z: calc(var(--depth) * 0.54);
+    --scene-perspective: 1900px;
+    --camera-z: calc(var(--depth) * 0.68);
   }
 
   .sound-controls {
@@ -924,8 +924,8 @@ body {
 @media (max-width: 540px) and (orientation: portrait) {
   :root {
     --wall-scale: 0.84;
-    --camera-z: calc(var(--depth) * 0.5);
-    --scene-perspective: 2200px;
+    --camera-z: calc(var(--depth) * 0.66);
+    --scene-perspective: 1900px;
     --arrow-size: 58px;
   }
 
