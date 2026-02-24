@@ -64,6 +64,7 @@ let mobilePopupOpenedAt = 0;
 let touchStartX = 0;
 let touchStartY = 0;
 let touchTracking = false;
+let lastTurnDirection = null;
 
 function normalizeAngle(angle) {
   return ((angle % 360) + 360) % 360;
@@ -118,6 +119,18 @@ function getClosestMobileTargetForView(viewName, currentAngle) {
   });
 
   return best;
+}
+
+function getMobileRollDeg() {
+  if (!isMobileMode) return 0;
+  if (lastTurnDirection !== "right" && lastTurnDirection !== "left") return 0;
+  const postCornerForRight = mobileStepIndex % 2 === 0;
+  const postCornerForLeft = mobileStepIndex % 2 === 1;
+  const shouldApplyRoll =
+    (lastTurnDirection === "right" && postCornerForRight) ||
+    (lastTurnDirection === "left" && postCornerForLeft);
+  if (!shouldApplyRoll) return 0;
+  return lastTurnDirection === "right" ? -2.4 : 2.4;
 }
 
 function tryPlayBackgroundMusic() {
@@ -272,10 +285,12 @@ function showRightWallInfo(hotspot) {
 }
 
 function renderView() {
-  room.style.transform = `translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateX(var(--camera-tilt-x)) rotateY(${currentRotationDeg}deg)`;
+  const mobileRollDeg = getMobileRollDeg();
+  room.style.transform = `translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateZ(${mobileRollDeg}deg) rotateX(var(--camera-tilt-x)) rotateY(${currentRotationDeg}deg)`;
 }
 
 function turn(direction) {
+  lastTurnDirection = direction;
   if (isMobileMode) {
     const stepDelta = direction === "right" ? 1 : -1;
     mobileStepIndex = ((mobileStepIndex + stepDelta) % 8 + 8) % 8;
@@ -300,6 +315,11 @@ function goToView(viewName) {
 
   if (isMobileMode) {
     const target = getClosestMobileTargetForView(viewName, currentRotationDeg);
+    if (target.delta > 0) {
+      lastTurnDirection = "right";
+    } else if (target.delta < 0) {
+      lastTurnDirection = "left";
+    }
     mobileStepIndex = target.stepIndex;
     currentRotationDeg += target.delta;
     currentViewIndex = views.indexOf(mobileViewSequence[mobileStepIndex]);
