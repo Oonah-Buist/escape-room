@@ -26,14 +26,16 @@ const soundVolume = document.getElementById("soundVolume");
 const modalCloseButtons = document.querySelectorAll(".modal-close");
 const modalActionButtons = document.querySelectorAll(".modal-action");
 
-const views = ["left", "front", "right"];
+const views = ["left", "front", "right", "back"];
 const viewAngles = {
   left: -90,
   front: 0,
   right: 90,
+  back: 180,
 };
 
 let currentViewIndex = 1;
+let currentRotationDeg = viewAngles[views[currentViewIndex]];
 let bubbleTimerId = null;
 let leftBubbleTimerId = null;
 let rightBubbleTimerId = null;
@@ -79,19 +81,24 @@ function applySoundState() {
 }
 
 function renderView() {
-  const view = views[currentViewIndex];
-  room.style.transform = `translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateY(${viewAngles[view]}deg)`;
+  room.style.transform = `translate3d(-50%, -50%, 0) translateZ(var(--camera-z)) rotateY(${currentRotationDeg}deg)`;
 }
 
 function turn(direction) {
   const delta = direction === "right" ? 1 : -1;
   currentViewIndex = (currentViewIndex + delta + views.length) % views.length;
+  currentRotationDeg += direction === "right" ? 90 : -90;
   renderView();
 }
 
 function goToView(viewName) {
   const nextIndex = views.indexOf(viewName);
   if (nextIndex === -1) return;
+  const normalizedCurrent = ((currentRotationDeg % 360) + 360) % 360;
+  const normalizedTarget = ((viewAngles[viewName] % 360) + 360) % 360;
+  let delta = ((normalizedTarget - normalizedCurrent + 540) % 360) - 180;
+  if (delta === -180) delta = 180;
+  currentRotationDeg += delta;
   currentViewIndex = nextIndex;
   renderView();
 }
