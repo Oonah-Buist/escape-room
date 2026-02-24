@@ -10,6 +10,7 @@ const frontWall = document.querySelector(".wall-front");
 const leftWallHotspots = document.querySelectorAll(".hotspot-word");
 const leftWallBubble = document.getElementById("leftWallBubble");
 const leftWall = document.querySelector(".wall-left");
+const backWall = document.querySelector(".wall-back");
 const windowHotspot = document.querySelector(".hotspot-window");
 const windowModal = document.getElementById("windowModal");
 const curtainHotspot = document.querySelector(".hotspot-curtain");
@@ -541,6 +542,34 @@ function pointInFrontSliverFromRightView(clientX, clientY) {
   return xPct <= 18;
 }
 
+function pointInBackSliverFromLeftView(clientX, clientY) {
+  if (pointInElementRect(backWall, clientX, clientY)) return true;
+  if (!scene) return false;
+  const rect = scene.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  return xPct <= 18;
+}
+
+function pointInBackSliverFromRightView(clientX, clientY) {
+  if (pointInElementRect(backWall, clientX, clientY)) return true;
+  if (!scene) return false;
+  const rect = scene.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
+  const xPct = ((clientX - rect.left) / rect.width) * 100;
+  return xPct >= 82;
+}
+
+function pointInLeftSliverFromBackView(clientX, clientY) {
+  return pointInElementRect(leftWall, clientX, clientY);
+}
+
+function pointInRightSliverFromBackView(clientX, clientY) {
+  return pointInElementRect(rightWall, clientX, clientY);
+}
+
 controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
 });
@@ -776,14 +805,32 @@ if (scene) {
     if (event.target.closest(".hotspot-switch")) return;
     if (event.target.closest(".hotspot-book")) return;
     if (event.target.closest(".hotspot-bottle")) return;
+    if (event.target.closest(".hotspot-word")) return;
+    if (event.target.closest(".hotspot-cancer")) return;
     if (event.target.closest(".sound-controls")) return;
     if (event.target.closest(".sound-toggle")) return;
     if (activeView === "left" && pointInFrontSliverFromLeftView(event.clientX, event.clientY)) {
       goToView("front");
       return;
     }
+    if (activeView === "left" && pointInBackSliverFromLeftView(event.clientX, event.clientY)) {
+      goToView("back");
+      return;
+    }
     if (activeView === "right" && pointInFrontSliverFromRightView(event.clientX, event.clientY)) {
       goToView("front");
+      return;
+    }
+    if (activeView === "right" && pointInBackSliverFromRightView(event.clientX, event.clientY)) {
+      goToView("back");
+      return;
+    }
+    if (activeView === "back" && pointInLeftSliverFromBackView(event.clientX, event.clientY)) {
+      goToView("left");
+      return;
+    }
+    if (activeView === "back" && pointInRightSliverFromBackView(event.clientX, event.clientY)) {
+      goToView("right");
       return;
     }
     if (activeView === "left") {
