@@ -3,9 +3,10 @@
   --bg-bottom: #090909;
   --scene-w: 100vw;
   --scene-h: 100vh;
+  --wall-scale: 1;
   --wall-aspect: 1.0965;
-  --wall-size: calc(var(--scene-h) * var(--wall-aspect));
-  --wall-height: var(--scene-h);
+  --wall-height: calc(var(--scene-h) * var(--wall-scale));
+  --wall-size: calc(var(--wall-height) * var(--wall-aspect));
   --depth: calc(var(--wall-size) / 2);
   --camera-z: calc(var(--depth) * 0.68);
   --scene-perspective: 1900px;
@@ -16,13 +17,19 @@
   --wall-seam-strip-right: 120px;
 }
 
+@supports (height: 100dvh) {
+  :root {
+    --scene-h: 100dvh;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: var(--scene-h);
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   background: radial-gradient(circle at 50% 10%, var(--bg-top), var(--bg-bottom) 60%);
   color: #f5f5f5;
@@ -30,7 +37,7 @@ body {
 }
 
 .experience {
-  min-height: 100vh;
+  min-height: var(--scene-h);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -470,7 +477,7 @@ body {
 .arrow-controls {
   position: fixed;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) - 0.5rem);
+  bottom: max(calc(env(safe-area-inset-bottom) + 0.25rem), 0.25rem);
   transform: translateX(-50%) perspective(600px) rotateX(38deg);
   display: flex;
   gap: calc(var(--arrow-size) * 4);
@@ -828,7 +835,7 @@ body {
   }
 
   .arrow-controls {
-    bottom: calc(env(safe-area-inset-bottom) - 0.35rem);
+    bottom: max(calc(env(safe-area-inset-bottom) + 0.4rem), 0.4rem);
   }
 
   .sound-controls {
@@ -876,8 +883,10 @@ body {
 
 @media (max-width: 900px), (pointer: coarse) {
   :root {
-    --arrow-size: 64px;
-    --scene-perspective: 1650px;
+    --arrow-size: 62px;
+    --wall-scale: 0.88;
+    --scene-perspective: 2450px;
+    --camera-z: calc(var(--depth) * 0.48);
   }
 
   .sound-controls {
@@ -886,7 +895,7 @@ body {
   }
 
   .arrow-controls {
-    bottom: calc(env(safe-area-inset-bottom) + 0.3rem);
+    bottom: max(calc(env(safe-area-inset-bottom) + 0.6rem), 0.6rem);
     gap: calc(var(--arrow-size) * 2.35);
   }
 
@@ -909,6 +918,19 @@ body {
     min-height: 44px;
     padding: 0.54rem 0.7rem;
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 540px) and (orientation: portrait) {
+  :root {
+    --wall-scale: 0.84;
+    --camera-z: calc(var(--depth) * 0.44);
+    --scene-perspective: 2700px;
+    --arrow-size: 58px;
+  }
+
+  .arrow-controls {
+    bottom: max(calc(env(safe-area-inset-bottom) + 0.7rem), 0.7rem);
   }
 }
 
