@@ -26,6 +26,13 @@ const soundToggle = document.getElementById("soundToggle");
 const soundVolume = document.getElementById("soundVolume");
 const modalCloseButtons = document.querySelectorAll(".modal-close");
 const modalActionButtons = document.querySelectorAll(".modal-action");
+const mobilePopup = document.getElementById("mobilePopup");
+const mobilePopupTitle = document.getElementById("mobilePopupTitle");
+const mobilePopupMessage = document.getElementById("mobilePopupMessage");
+const mobilePopupClose = document.getElementById("mobilePopupClose");
+const mobilePopupReturn = document.getElementById("mobilePopupReturn");
+const mobileOpenPdf = document.getElementById("mobileOpenPdf");
+const mobileModeQuery = window.matchMedia("(max-width: 900px), (pointer: coarse)");
 
 const views = ["left", "front", "right", "back"];
 const viewAngles = {
@@ -49,6 +56,11 @@ let bottleOpenedAt = 0;
 let soundEnabled = true;
 let soundVolumeLevel = 0.7;
 const baseMusicVolume = 0.08;
+let isMobileMode = mobileModeQuery.matches;
+let mobilePopupOpenedAt = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchTracking = false;
 
 function tryPlayBackgroundMusic() {
   if (!backgroundMusic || !soundEnabled) return;
@@ -79,6 +91,110 @@ function applySoundState() {
     backgroundMusic.muted = true;
     backgroundMusic.pause();
   }
+}
+
+function closeMobilePopup() {
+  if (!mobilePopup) return;
+  mobilePopup.classList.remove("is-open");
+  mobilePopup.setAttribute("aria-hidden", "true");
+}
+
+function openMobilePopup({ title, message, pdfPath = "" }) {
+  if (!mobilePopup || !mobilePopupTitle || !mobilePopupMessage || !mobileOpenPdf) return;
+  mobilePopupOpenedAt = Date.now();
+  mobilePopupTitle.textContent = title || "Information";
+  mobilePopupMessage.textContent = message || "";
+  const hasPdf = Boolean(pdfPath);
+  mobileOpenPdf.classList.toggle("is-visible", hasPdf);
+  mobileOpenPdf.setAttribute("aria-hidden", String(!hasPdf));
+  mobileOpenPdf.href = hasPdf ? pdfPath : "#";
+  mobilePopup.classList.add("is-open");
+  mobilePopup.setAttribute("aria-hidden", "false");
+}
+
+function openMobilePdfPrompt(title, pdfPath) {
+  openMobilePopup({
+    title,
+    message: "Tap Open PDF to view in a new tab.\nThen tap Return to room to continue.",
+    pdfPath,
+  });
+}
+
+function isAnyPopupOpen() {
+  return Boolean(
+    windowModal?.classList.contains("is-open") ||
+      curtainModal?.classList.contains("is-open") ||
+      switchModal?.classList.contains("is-open") ||
+      bookModal?.classList.contains("is-open") ||
+      bottleModal?.classList.contains("is-open") ||
+      mobilePopup?.classList.contains("is-open")
+  );
+}
+
+function applyTapTargetSizing() {
+  const hotspotGroups = [
+    { wall: leftWall, hotspots: leftWallHotspots },
+    { wall: rightWall, hotspots: rightWallHotspots },
+  ];
+
+  hotspotGroups.forEach(({ wall, hotspots }) => {
+    const wallImage = wall?.querySelector("img");
+    const wallWidth = wallImage?.naturalWidth || 1000;
+    const wallHeight = wallImage?.naturalHeight || 912;
+    const minW = (44 / wallWidth) * 100;
+    const minH = (44 / wallHeight) * 100;
+
+    hotspots.forEach((hotspot) => {
+      if (!isMobileMode) {
+        hotspot.style.removeProperty("--tap-x");
+        hotspot.style.removeProperty("--tap-y");
+        hotspot.style.removeProperty("--tap-w");
+        hotspot.style.removeProperty("--tap-h");
+        return;
+      }
+
+      const { x, y, w, h } = getHotspotBounds(hotspot);
+      const paddedW = Math.max(w, minW);
+      const paddedH = Math.max(h, minH);
+      const paddedX = Math.max(0, Math.min(100 - paddedW, x - (paddedW - w) / 2));
+      const paddedY = Math.max(0, Math.min(100 - paddedH, y - (paddedH - h) / 2));
+
+      hotspot.style.setProperty("--tap-x", `${paddedX}%`);
+      hotspot.style.setProperty("--tap-y", `${paddedY}%`);
+      hotspot.style.setProperty("--tap-w", `${paddedW}%`);
+      hotspot.style.setProperty("--tap-h", `${paddedH}%`);
+    });
+  });
+}
+
+function syncMobileMode() {
+  isMobileMode = mobileModeQuery.matches;
+  document.body.classList.toggle("is-mobile-mode", isMobileMode);
+  applyTapTargetSizing();
+}
+
+function showLeftWallInfo(hotspot) {
+  if (!hotspot) return;
+  if (isMobileMode) {
+    openMobilePopup({
+      title: hotspot.getAttribute("aria-label") || "Condition",
+      message: "This condition has\nPPARy involvement",
+    });
+    return;
+  }
+  showLeftWallMessage(hotspot);
+}
+
+function showRightWallInfo(hotspot) {
+  if (!hotspot) return;
+  if (isMobileMode) {
+    openMobilePopup({
+      title: hotspot.getAttribute("aria-label") || "Cancer",
+      message: "This cancer\nhas PPARy involvement",
+    });
+    return;
+  }
+  showRightWallMessage(hotspot);
 }
 
 function renderView() {
@@ -212,12 +328,20 @@ function showDoorMessage() {
 
 function openWindowModal() {
   if (!windowModal) return;
+  if (isMobileMode) {
+    openMobilePdfPrompt("Window document", "Assets/Window.pdf");
+    return;
+  }
   windowOpenedAt = Date.now();
   windowModal.classList.add("is-open");
   windowModal.setAttribute("aria-hidden", "false");
 }
 
 function closeWindowModal() {
+  if (isMobileMode) {
+    closeMobilePopup();
+    return;
+  }
   if (!windowModal) return;
   windowModal.classList.remove("is-open");
   windowModal.setAttribute("aria-hidden", "true");
@@ -225,12 +349,20 @@ function closeWindowModal() {
 
 function openCurtainModal() {
   if (!curtainModal) return;
+  if (isMobileMode) {
+    openMobilePdfPrompt("Curtain document", "Assets/Curtain.pdf");
+    return;
+  }
   curtainOpenedAt = Date.now();
   curtainModal.classList.add("is-open");
   curtainModal.setAttribute("aria-hidden", "false");
 }
 
 function closeCurtainModal() {
+  if (isMobileMode) {
+    closeMobilePopup();
+    return;
+  }
   if (!curtainModal) return;
   curtainModal.classList.remove("is-open");
   curtainModal.setAttribute("aria-hidden", "true");
@@ -238,12 +370,20 @@ function closeCurtainModal() {
 
 function openSwitchModal() {
   if (!switchModal) return;
+  if (isMobileMode) {
+    openMobilePdfPrompt("Light switch document", "Assets/Light%20switch.pdf");
+    return;
+  }
   switchOpenedAt = Date.now();
   switchModal.classList.add("is-open");
   switchModal.setAttribute("aria-hidden", "false");
 }
 
 function closeSwitchModal() {
+  if (isMobileMode) {
+    closeMobilePopup();
+    return;
+  }
   if (!switchModal) return;
   switchModal.classList.remove("is-open");
   switchModal.setAttribute("aria-hidden", "true");
@@ -251,12 +391,20 @@ function closeSwitchModal() {
 
 function openBookModal() {
   if (!bookModal) return;
+  if (isMobileMode) {
+    openMobilePdfPrompt("Book document", "Assets/Book.pdf");
+    return;
+  }
   bookOpenedAt = Date.now();
   bookModal.classList.add("is-open");
   bookModal.setAttribute("aria-hidden", "false");
 }
 
 function closeBookModal() {
+  if (isMobileMode) {
+    closeMobilePopup();
+    return;
+  }
   if (!bookModal) return;
   bookModal.classList.remove("is-open");
   bookModal.setAttribute("aria-hidden", "true");
@@ -264,12 +412,20 @@ function closeBookModal() {
 
 function openBottleModal() {
   if (!bottleModal) return;
+  if (isMobileMode) {
+    openMobilePdfPrompt("Bottle document", "Assets/Bottle.pdf");
+    return;
+  }
   bottleOpenedAt = Date.now();
   bottleModal.classList.add("is-open");
   bottleModal.setAttribute("aria-hidden", "false");
 }
 
 function closeBottleModal() {
+  if (isMobileMode) {
+    closeMobilePopup();
+    return;
+  }
   if (!bottleModal) return;
   bottleModal.classList.remove("is-open");
   bottleModal.setAttribute("aria-hidden", "true");
@@ -574,6 +730,56 @@ controls.forEach((control) => {
   control.addEventListener("click", () => turn(control.dataset.turn));
 });
 
+if (scene) {
+  scene.addEventListener(
+    "touchstart",
+    (event) => {
+      if (isAnyPopupOpen()) {
+        touchTracking = false;
+        return;
+      }
+      const target = event.target;
+      if (
+        target.closest(".arrow-controls") ||
+        target.closest(".sound-controls") ||
+        target.closest(".window-modal") ||
+        target.closest(".mobile-popup") ||
+        target.closest(".hotspot-donate")
+      ) {
+        touchTracking = false;
+        return;
+      }
+      const [touch] = event.touches;
+      if (!touch) return;
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchTracking = true;
+    },
+    { passive: true }
+  );
+
+  scene.addEventListener(
+    "touchend",
+    (event) => {
+      if (!touchTracking || isAnyPopupOpen()) return;
+      touchTracking = false;
+      const [touch] = event.changedTouches;
+      if (!touch) return;
+
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      if (Math.abs(dx) < 56) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      if (dx < 0) {
+        turn("right");
+      } else {
+        turn("left");
+      }
+    },
+    { passive: true }
+  );
+}
+
 if (soundToggle) {
   soundToggle.addEventListener("click", (event) => {
     event.preventDefault();
@@ -618,6 +824,32 @@ modalActionButtons.forEach((button) => {
     }
   });
 });
+
+if (mobilePopupClose) {
+  mobilePopupClose.addEventListener("click", (event) => {
+    event.preventDefault();
+    closeMobilePopup();
+  });
+}
+
+if (mobilePopupReturn) {
+  mobilePopupReturn.addEventListener("click", (event) => {
+    event.preventDefault();
+    closeMobilePopup();
+  });
+}
+
+if (mobileOpenPdf) {
+  mobileOpenPdf.addEventListener("click", (event) => {
+    if (!mobileOpenPdf.classList.contains("is-visible")) {
+      event.preventDefault();
+      return;
+    }
+    setTimeout(() => {
+      closeMobilePopup();
+    }, 120);
+  });
+}
 
 if (backgroundMusic) {
   if (soundVolume) {
@@ -734,6 +966,15 @@ if (bottleModal) {
   });
 }
 
+if (mobilePopup) {
+  mobilePopup.addEventListener("click", (event) => {
+    if (Date.now() - mobilePopupOpenedAt < 180) return;
+    if (event.target === mobilePopup) {
+      closeMobilePopup();
+    }
+  });
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeWindowModal();
@@ -741,6 +982,7 @@ document.addEventListener("keydown", (event) => {
     closeSwitchModal();
     closeBookModal();
     closeBottleModal();
+    closeMobilePopup();
   }
 });
 
@@ -754,27 +996,32 @@ if (doorHotspot) {
 leftWallHotspots.forEach((hotspot) => {
   hotspot.addEventListener("pointerup", (event) => {
     event.preventDefault();
-    showLeftWallMessage(hotspot);
+    event.stopPropagation();
+    showLeftWallInfo(hotspot);
   });
   hotspot.addEventListener("click", (event) => {
     event.preventDefault();
-    showLeftWallMessage(hotspot);
+    event.stopPropagation();
+    showLeftWallInfo(hotspot);
   });
 });
 
 rightWallHotspots.forEach((hotspot) => {
   hotspot.addEventListener("pointerup", (event) => {
     event.preventDefault();
-    showRightWallMessage(hotspot);
+    event.stopPropagation();
+    showRightWallInfo(hotspot);
   });
   hotspot.addEventListener("click", (event) => {
     event.preventDefault();
-    showRightWallMessage(hotspot);
+    event.stopPropagation();
+    showRightWallInfo(hotspot);
   });
 });
 
 if (scene) {
   scene.addEventListener("click", (event) => {
+    if (isAnyPopupOpen()) return;
     const activeView = views[currentViewIndex];
     if (activeView === "front") {
       if (pointInSwitchRegion(event.clientX, event.clientY)) {
@@ -836,7 +1083,7 @@ if (scene) {
     if (activeView === "left") {
       const leftHotspot = findWordHotspotAtPoint(leftWall, leftWallHotspots, event.clientX, event.clientY);
       if (leftHotspot) {
-        showLeftWallMessage(leftHotspot);
+        showLeftWallInfo(leftHotspot);
         return;
       }
       if (pointInWindowRegion(event.clientX, event.clientY)) {
@@ -852,10 +1099,19 @@ if (scene) {
       }
       const rightHotspot = findWordHotspotAtPoint(rightWall, rightWallHotspots, event.clientX, event.clientY);
       if (rightHotspot) {
-        showRightWallMessage(rightHotspot);
+        showRightWallInfo(rightHotspot);
       }
     }
   });
 }
 
+if (typeof mobileModeQuery.addEventListener === "function") {
+  mobileModeQuery.addEventListener("change", syncMobileMode);
+} else if (typeof mobileModeQuery.addListener === "function") {
+  mobileModeQuery.addListener(syncMobileMode);
+}
+
+window.addEventListener("resize", applyTapTargetSizing);
+window.addEventListener("load", applyTapTargetSizing);
+syncMobileMode();
 renderView();
