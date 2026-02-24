@@ -889,8 +889,8 @@ body {
     --wall-scale: 0.88;
     --scene-perspective: 1900px;
     --camera-z: calc(var(--depth) * 0.68);
-    --scene-perspective-origin-y: 62%;
-    --camera-tilt-x: 4deg;
+    --scene-perspective-origin-y: 38%;
+    --camera-tilt-x: -4deg;
   }
 
   .sound-controls {
@@ -930,8 +930,8 @@ body {
     --wall-scale: 0.84;
     --camera-z: calc(var(--depth) * 0.66);
     --scene-perspective: 1900px;
-    --scene-perspective-origin-y: 64%;
-    --camera-tilt-x: 4.8deg;
+    --scene-perspective-origin-y: 36%;
+    --camera-tilt-x: -4.8deg;
     --arrow-size: 58px;
   }
 
