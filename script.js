@@ -38,8 +38,15 @@ const userAgent = navigator.userAgent || "";
 const isSafariBrowser =
   /Safari/i.test(userAgent) &&
   !/Chrome|CriOS|Chromium|Edg|OPR|FxiOS/i.test(userAgent);
+const isIOSWebKit =
+  /AppleWebKit/i.test(userAgent) &&
+  (/iPad|iPhone|iPod/i.test(userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
 if (isSafariBrowser) {
   document.documentElement.classList.add("is-safari");
+}
+if (isIOSWebKit) {
+  document.documentElement.classList.add("is-ios-webkit");
 }
 
 const views = ["left", "front", "right", "back"];
