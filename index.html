@@ -11,7 +11,12 @@
     <div class="scene" aria-label="3D room view">
       <div class="room" id="room">
         <figure class="wall wall-front">
-          <img src="Assets/FrontWall.webp" alt="Front wall">
+          <img
+            src="Assets/FrontWall.webp"
+            srcset="Assets/FrontWall-mobile.webp 720w, Assets/FrontWall.webp 1000w"
+            sizes="100vw"
+            alt="Front wall"
+          >
           <button class="hotspot-switch" type="button" aria-label="Open light switch document"></button>
           <button class="hotspot-book" type="button" aria-label="Open book document"></button>
           <button class="hotspot-bottle" type="button" aria-label="Open bottle document"></button>
@@ -32,7 +37,12 @@
           </div>
         </figure>
         <figure class="wall wall-left">
-          <img src="Assets/LeftWall.webp" alt="Left wall">
+          <img
+            src="Assets/LeftWall.webp"
+            srcset="Assets/LeftWall-mobile.webp 720w, Assets/LeftWall.webp 1000w"
+            sizes="100vw"
+            alt="Left wall"
+          >
           <button class="hotspot-window" type="button" aria-label="Open window document"></button>
           <button class="hotspot-word" type="button" aria-label="Atherosclerosis" style="--x: 6.7%; --y: 1.8%; --w: 41.3%; --h: 7.6%;"></button>
           <button class="hotspot-word" type="button" aria-label="NAFLD" style="--x: 50.5%; --y: 1.8%; --w: 23.7%; --h: 7.6%;"></button>
@@ -53,7 +63,12 @@
           </div>
         </figure>
         <figure class="wall wall-right">
-          <img src="Assets/RightWall.webp" alt="Right wall">
+          <img
+            src="Assets/RightWall.webp"
+            srcset="Assets/RightWall-mobile.webp 720w, Assets/RightWall.webp 1000w"
+            sizes="100vw"
+            alt="Right wall"
+          >
           <button class="hotspot-curtain" type="button" aria-label="Open curtain document"></button>
           <button class="hotspot-cancer" type="button" aria-label="Medulloblastoma" style="--x: 18%; --y: 2.2%; --w: 48%; --h: 6.6%;"></button>
           <button class="hotspot-cancer" type="button" aria-label="Ewing Sarcoma" style="--x: 4.5%; --y: 12.6%; --w: 18.5%; --h: 7.7%;"></button>
@@ -80,7 +95,12 @@
           </div>
         </figure>
         <figure class="wall wall-back">
-          <img src="Assets/Wall.webp" alt="Back wall">
+          <img
+            src="Assets/Wall.webp"
+            srcset="Assets/Wall-mobile.webp 720w, Assets/Wall.webp 1000w"
+            sizes="100vw"
+            alt="Back wall"
+          >
         </figure>
       </div>
       <div class="sunlight-overlay" aria-hidden="true">
@@ -130,13 +150,21 @@
       </div>
     </div>
   </main>
-  <div class="window-modal" id="windowModal" aria-hidden="true">
+      <div class="window-modal" id="windowModal" aria-hidden="true">
     <div class="window-modal-panel" role="dialog" aria-modal="true" aria-label="Window document">
       <div class="modal-header">
         <button class="modal-close" type="button" aria-label="Close window document">x</button>
       </div>
       <div class="modal-content">
-        <img class="modal-doc-image" src="Assets/Window.png" alt="Window document">
+        <img
+          class="modal-doc-image"
+          src="Assets/Window.png"
+          srcset="Assets/Window-mobile.webp 820w, Assets/Window.png 1376w"
+          sizes="(max-width: 900px) 94vw, 82vw"
+          alt="Window document"
+          loading="lazy"
+          decoding="async"
+        >
       </div>
       <div class="modal-actions">
         <button class="modal-action" type="button" data-action="save" data-pdf="Assets/Window.pdf">Save</button>
@@ -150,7 +178,15 @@
         <button class="modal-close" type="button" aria-label="Close curtain document">x</button>
       </div>
       <div class="modal-content">
-        <img class="modal-doc-image" src="Assets/Curtain.png" alt="Curtain document">
+        <img
+          class="modal-doc-image"
+          src="Assets/Curtain.png"
+          srcset="Assets/Curtain-mobile.webp 820w, Assets/Curtain.png 1376w"
+          sizes="(max-width: 900px) 94vw, 82vw"
+          alt="Curtain document"
+          loading="lazy"
+          decoding="async"
+        >
       </div>
       <div class="modal-actions">
         <button class="modal-action" type="button" data-action="save" data-pdf="Assets/Curtain.pdf">Save</button>
@@ -164,7 +200,15 @@
         <button class="modal-close" type="button" aria-label="Close light switch document">x</button>
       </div>
       <div class="modal-content">
-        <img class="modal-doc-image" src="Assets/Light%20switch.png" alt="Light switch document">
+        <img
+          class="modal-doc-image"
+          src="Assets/Light%20switch.png"
+          srcset="Assets/Light%20switch-mobile.webp 820w, Assets/Light%20switch.png 1376w"
+          sizes="(max-width: 900px) 94vw, 82vw"
+          alt="Light switch document"
+          loading="lazy"
+          decoding="async"
+        >
       </div>
       <div class="modal-actions">
         <button class="modal-action" type="button" data-action="save" data-pdf="Assets/Light%20switch.pdf">Save</button>
@@ -178,7 +222,15 @@
         <button class="modal-close" type="button" aria-label="Close book document">x</button>
       </div>
       <div class="modal-content">
-        <img class="modal-doc-image" src="Assets/Book.png" alt="Book document">
+        <img
+          class="modal-doc-image"
+          src="Assets/Book.png"
+          srcset="Assets/Book-mobile.webp 820w, Assets/Book.png 1376w"
+          sizes="(max-width: 900px) 94vw, 82vw"
+          alt="Book document"
+          loading="lazy"
+          decoding="async"
+        >
       </div>
       <div class="modal-actions">
         <button class="modal-action" type="button" data-action="save" data-pdf="Assets/Book.pdf">Save</button>
@@ -192,11 +244,30 @@
         <button class="modal-close" type="button" aria-label="Close bottle document">x</button>
       </div>
       <div class="modal-content">
-        <img class="modal-doc-image" src="Assets/Bottle.png" alt="Bottle document">
+        <img
+          class="modal-doc-image"
+          src="Assets/Bottle.png"
+          srcset="Assets/Bottle-mobile.webp 820w, Assets/Bottle.png 1376w"
+          sizes="(max-width: 900px) 94vw, 82vw"
+          alt="Bottle document"
+          loading="lazy"
+          decoding="async"
+        >
       </div>
       <div class="modal-actions">
         <button class="modal-action" type="button" data-action="save" data-pdf="Assets/Bottle.pdf">Save</button>
         <button class="modal-action" type="button" data-action="print" data-pdf="Assets/Bottle.pdf">Print</button>
+      </div>
+    </div>
+  </div>
+  <div class="mobile-popup" id="mobilePopup" aria-hidden="true">
+    <div class="mobile-popup-card" role="dialog" aria-modal="true" aria-labelledby="mobilePopupTitle">
+      <button class="mobile-popup-close" id="mobilePopupClose" type="button" aria-label="Close popup">x</button>
+      <h2 class="mobile-popup-title" id="mobilePopupTitle"></h2>
+      <p class="mobile-popup-message" id="mobilePopupMessage"></p>
+      <div class="mobile-popup-actions">
+        <a class="mobile-popup-action mobile-open-pdf" id="mobileOpenPdf" href="#" target="_blank" rel="noopener noreferrer">Open PDF</a>
+        <button class="mobile-popup-action mobile-return" id="mobilePopupReturn" type="button">Return to room</button>
       </div>
     </div>
   </div>
