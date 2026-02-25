@@ -136,6 +136,12 @@ function tryPlayBackgroundMusic() {
   }
 }
 
+function updateVolumeSliderVisual() {
+  if (!soundVolume) return;
+  const sliderPercent = Math.max(0, Math.min(100, Math.round(soundVolumeLevel * 100)));
+  soundVolume.style.setProperty("--volume-percent", `${sliderPercent}%`);
+}
+
 function applySoundState() {
   if (soundToggle) {
     soundToggle.classList.toggle("is-muted", !soundEnabled);
@@ -147,6 +153,7 @@ function applySoundState() {
   if (soundVolume) {
     soundVolume.value = String(Math.round(soundVolumeLevel * 100));
   }
+  updateVolumeSliderVisual();
 
   if (!backgroundMusic) return;
   backgroundMusic.volume = baseMusicVolume * soundVolumeLevel;
@@ -896,6 +903,7 @@ if (soundVolume) {
     const rawValue = Number(event.target.value);
     if (!Number.isFinite(rawValue)) return;
     soundVolumeLevel = Math.max(0, Math.min(1, rawValue / 100));
+    updateVolumeSliderVisual();
     if (backgroundMusic) {
       backgroundMusic.volume = baseMusicVolume * soundVolumeLevel;
     }

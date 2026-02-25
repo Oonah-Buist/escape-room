@@ -627,8 +627,59 @@ body {
 
 .sound-volume {
   width: 112px;
-  accent-color: #d56b1f;
+  height: 10px;
+  border-radius: 999px;
+  border: 0;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(
+    to right,
+    #d56b1f 0%,
+    #d56b1f var(--volume-percent, 70%),
+    rgba(255, 255, 255, 0.82) var(--volume-percent, 70%),
+    rgba(255, 255, 255, 0.82) 100%
+  );
   cursor: pointer;
+}
+
+.sound-volume::-webkit-slider-runnable-track {
+  height: 10px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.sound-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -7px;
+  border-radius: 50%;
+  border: 1px solid rgba(30, 15, 6, 0.55);
+  background: #d56b1f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.sound-volume::-moz-range-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.sound-volume::-moz-range-progress {
+  height: 10px;
+  border-radius: 999px;
+  background: #d56b1f;
+}
+
+.sound-volume::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(30, 15, 6, 0.55);
+  border-radius: 50%;
+  background: #d56b1f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
 }
 
 .window-modal {
