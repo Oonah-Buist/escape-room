@@ -34,6 +34,14 @@ const mobilePopupReturn = document.getElementById("mobilePopupReturn");
 const mobileOpenPdf = document.getElementById("mobileOpenPdf");
 const mobileModeQuery = window.matchMedia("(max-width: 900px) and (hover: none) and (pointer: coarse)");
 
+const userAgent = navigator.userAgent || "";
+const isSafariBrowser =
+  /Safari/i.test(userAgent) &&
+  !/Chrome|CriOS|Chromium|Edg|OPR|FxiOS/i.test(userAgent);
+if (isSafariBrowser) {
+  document.documentElement.classList.add("is-safari");
+}
+
 const views = ["left", "front", "right", "back"];
 const mobileViewSequence = ["front", "front", "right", "right", "back", "back", "left", "left"];
 const mobileHalfStepOffsetDeg = 18;

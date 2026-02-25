@@ -748,12 +748,21 @@ body {
   background: #000 !important;
 }
 
+/* Safari-only camera/perspective tuning (set by script.js class on <html>). */
+html.is-safari {
+  --camera-z: calc(var(--depth) * 0.58);
+  --scene-perspective: 1700px;
+}
+
+html.is-safari .scene {
+  -webkit-perspective: var(--scene-perspective);
+  perspective: var(--scene-perspective);
+}
+
 /* Safari fallback: avoid blend-mode compositing that can flatten 3D layers. */
-@supports (-webkit-touch-callout: none) {
-  .scene::before,
-  .sunlight-ray {
-    mix-blend-mode: normal;
-  }
+html.is-safari .scene::before,
+html.is-safari .sunlight-ray {
+  mix-blend-mode: normal;
 }
 
 .mobile-popup {
