@@ -584,13 +584,18 @@ body {
 
 .sound-toggle-icon {
   position: absolute;
-  inset: 10px;
+  width: 18px;
+  height: 18px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   fill: none;
   stroke: #f5f5f5;
   stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
   opacity: 1;
+  overflow: hidden;
   transition: opacity 140ms ease;
 }
 
@@ -932,7 +937,8 @@ html.is-safari .sunlight-ray {
   }
 
   .sound-toggle-icon {
-    inset: 8px;
+    width: 16px;
+    height: 16px;
   }
 
   .sound-volume-wrap {
