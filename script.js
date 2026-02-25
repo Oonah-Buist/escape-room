@@ -32,6 +32,7 @@ const mobilePopupMessage = document.getElementById("mobilePopupMessage");
 const mobilePopupClose = document.getElementById("mobilePopupClose");
 const mobilePopupReturn = document.getElementById("mobilePopupReturn");
 const mobileOpenPdf = document.getElementById("mobileOpenPdf");
+const entryOverlay = document.getElementById("entryOverlay");
 const mobileModeQuery = window.matchMedia("(max-width: 900px) and (hover: none) and (pointer: coarse)");
 
 const userAgent = navigator.userAgent || "";
@@ -79,6 +80,30 @@ let mobilePopupOpenedAt = 0;
 let touchStartX = 0;
 let touchStartY = 0;
 let touchTracking = false;
+let entryRevealStarted = false;
+
+function startEntryReveal() {
+  if (entryRevealStarted || !entryOverlay) return;
+  entryRevealStarted = true;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      entryOverlay.classList.add("is-hidden");
+    });
+  });
+
+  entryOverlay.addEventListener(
+    "transitionend",
+    () => {
+      entryOverlay.classList.add("is-gone");
+    },
+    { once: true }
+  );
+
+  window.setTimeout(() => {
+    entryOverlay.classList.add("is-gone");
+  }, 1500);
+}
 
 function normalizeAngle(angle) {
   return ((angle % 360) + 360) % 360;
@@ -1231,3 +1256,14 @@ window.addEventListener("resize", applyTapTargetSizing);
 window.addEventListener("load", applyTapTargetSizing);
 syncMobileMode();
 renderView();
+
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+if (prefersReducedMotion.matches) {
+  if (entryOverlay) {
+    entryOverlay.classList.add("is-gone");
+  }
+} else {
+  window.addEventListener("load", startEntryReveal, { once: true });
+  window.addEventListener("pageshow", startEntryReveal, { once: true });
+  window.setTimeout(startEntryReveal, 1200);
+}
