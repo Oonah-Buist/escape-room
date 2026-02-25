@@ -566,6 +566,7 @@ body {
   height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 999px;
+  overflow: hidden;
   padding: 0;
   margin: 0;
   background: rgba(0, 0, 0, 0.62);
@@ -583,7 +584,7 @@ body {
 
 .sound-toggle-icon {
   position: absolute;
-  inset: 9px;
+  inset: 10px;
   fill: none;
   stroke: #f5f5f5;
   stroke-width: 1.9;
@@ -931,7 +932,7 @@ html.is-safari .sunlight-ray {
   }
 
   .sound-toggle-icon {
-    inset: 7px;
+    inset: 8px;
   }
 
   .sound-volume-wrap {
