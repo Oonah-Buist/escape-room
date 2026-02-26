@@ -10,9 +10,8 @@
 <body>
   <main class="experience">
     <div class="scene" aria-label="3D room view">
-      <div class="room-stage">
-        <div class="room" id="room">
-          <figure class="wall wall-front">
+      <div class="room" id="room">
+        <figure class="wall wall-front">
           <img
             src="Assets/FrontWall.webp"
             srcset="Assets/FrontWall-mobile.webp 720w, Assets/FrontWall.webp 1000w"
@@ -40,8 +39,8 @@
           <div class="speech-bubble door-bubble" id="doorBubble" role="status" aria-live="polite">
             With £50,000 we can pass through this door.
           </div>
-          </figure>
-          <figure class="wall wall-left">
+        </figure>
+        <figure class="wall wall-left">
           <img
             src="Assets/LeftWall.webp"
             srcset="Assets/LeftWall-mobile.webp 720w, Assets/LeftWall.webp 1000w"
@@ -66,8 +65,8 @@
           <div class="speech-bubble left-bubble" id="leftWallBubble" role="status" aria-live="polite">
             This condition has<br>PPARy involvement
           </div>
-          </figure>
-          <figure class="wall wall-right">
+        </figure>
+        <figure class="wall wall-right">
           <img
             src="Assets/RightWall.webp"
             srcset="Assets/RightWall-mobile.webp 720w, Assets/RightWall.webp 1000w"
@@ -98,21 +97,21 @@
           <div class="speech-bubble right-bubble" id="rightWallBubble" role="status" aria-live="polite">
             This cancer<br>has PPARy involvement
           </div>
-          </figure>
-          <figure class="wall wall-back">
+        </figure>
+        <figure class="wall wall-back">
           <img
             src="Assets/Wall.webp"
             srcset="Assets/Wall-mobile.webp 720w, Assets/Wall.webp 1000w"
             sizes="100vw"
             alt="Back wall"
           >
-          </figure>
-        </div>
+        </figure>
       </div>
       <div class="sunlight-overlay" aria-hidden="true">
         <div class="sunlight-ray sunlight-ray-main"></div>
         <div class="sunlight-ray sunlight-ray-soft"></div>
       </div>
+      <div class="entry-cinematic" aria-hidden="true"></div>
       <nav class="arrow-controls" aria-label="Turn room view">
         <button class="arrow arrow-left" data-turn="left" aria-label="Turn left"></button>
         <button class="arrow arrow-right" data-turn="right" aria-label="Turn right"></button>
