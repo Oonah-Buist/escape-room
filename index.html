@@ -10,8 +10,9 @@
 <body>
   <main class="experience">
     <div class="scene" aria-label="3D room view">
-      <div class="room" id="room">
-        <figure class="wall wall-front">
+      <div class="room-stage">
+        <div class="room" id="room">
+          <figure class="wall wall-front">
           <img
             src="Assets/FrontWall.webp"
             srcset="Assets/FrontWall-mobile.webp 720w, Assets/FrontWall.webp 1000w"
@@ -39,8 +40,8 @@
           <div class="speech-bubble door-bubble" id="doorBubble" role="status" aria-live="polite">
             With £50,000 we can pass through this door.
           </div>
-        </figure>
-        <figure class="wall wall-left">
+          </figure>
+          <figure class="wall wall-left">
           <img
             src="Assets/LeftWall.webp"
             srcset="Assets/LeftWall-mobile.webp 720w, Assets/LeftWall.webp 1000w"
@@ -65,8 +66,8 @@
           <div class="speech-bubble left-bubble" id="leftWallBubble" role="status" aria-live="polite">
             This condition has<br>PPARy involvement
           </div>
-        </figure>
-        <figure class="wall wall-right">
+          </figure>
+          <figure class="wall wall-right">
           <img
             src="Assets/RightWall.webp"
             srcset="Assets/RightWall-mobile.webp 720w, Assets/RightWall.webp 1000w"
@@ -97,15 +98,16 @@
           <div class="speech-bubble right-bubble" id="rightWallBubble" role="status" aria-live="polite">
             This cancer<br>has PPARy involvement
           </div>
-        </figure>
-        <figure class="wall wall-back">
+          </figure>
+          <figure class="wall wall-back">
           <img
             src="Assets/Wall.webp"
             srcset="Assets/Wall-mobile.webp 720w, Assets/Wall.webp 1000w"
             sizes="100vw"
             alt="Back wall"
           >
-        </figure>
+          </figure>
+        </div>
       </div>
       <div class="sunlight-overlay" aria-hidden="true">
         <div class="sunlight-ray sunlight-ray-main"></div>
