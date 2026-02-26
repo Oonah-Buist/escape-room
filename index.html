@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Escape Room View</title>
+  <link rel="preload" as="image" href="Assets/FrontWall.webp">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,6 +16,9 @@
             src="Assets/FrontWall.webp"
             srcset="Assets/FrontWall-mobile.webp 720w, Assets/FrontWall.webp 1000w"
             sizes="100vw"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
             alt="Front wall"
           >
           <button class="hotspot-switch" type="button" aria-label="Open light switch document"></button>
@@ -274,11 +278,10 @@
   <audio
     id="bgMusic"
     src="Assets/Dvorak - Songs My Mother Taught Me.mp3"
-    preload="auto"
+    preload="none"
     loop
     aria-hidden="true"
   ></audio>
-  <div class="entry-overlay" id="entryOverlay" aria-hidden="true"></div>
   <script src="script.js"></script>
 </body>
 </html>

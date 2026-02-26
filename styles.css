@@ -36,24 +36,6 @@ body {
   overflow: hidden;
 }
 
-.entry-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 120;
-  pointer-events: none;
-  background: #000;
-  opacity: 1;
-  transition: opacity 980ms cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-.entry-overlay.is-hidden {
-  opacity: 0;
-}
-
-.entry-overlay.is-gone {
-  display: none;
-}
-
 .experience {
   min-height: var(--scene-h);
   display: flex;
@@ -76,8 +58,8 @@ body {
   overflow: hidden;
   border-radius: 0;
   background:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.6)),
-    radial-gradient(circle at 50% 0%, #222 0%, #111 55%, #0a0a0a 100%);
+    linear-gradient(to bottom, rgba(30, 24, 18, 0.18), rgba(30, 24, 18, 0.34)),
+    radial-gradient(circle at 50% 0%, #a8a39b 0%, #8f8a82 55%, #776f66 100%);
   box-shadow: none;
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
@@ -1079,11 +1061,5 @@ html.is-ios-webkit .sunlight-ray {
   .modal-action:focus-visible {
     border-color: rgba(255, 255, 255, 0.34);
     background: rgba(18, 18, 18, 0.9);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .entry-overlay {
-    transition: none;
   }
 }
