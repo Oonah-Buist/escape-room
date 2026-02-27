@@ -444,7 +444,7 @@ function showDoorMessage() {
 function openWindowModal() {
   if (!windowModal) return;
   if (isMobileMode) {
-    openMobilePdfPrompt("Window document", "Assets/Window.pdf");
+    openMobilePdfPrompt("Multiple disease involvement", "Assets/Window.pdf");
     return;
   }
   windowOpenedAt = Date.now();
@@ -465,7 +465,7 @@ function closeWindowModal() {
 function openCurtainModal() {
   if (!curtainModal) return;
   if (isMobileMode) {
-    openMobilePdfPrompt("Curtain document", "Assets/Curtain.pdf");
+    openMobilePdfPrompt("Childhood and adult cancers", "Assets/Curtain.pdf");
     return;
   }
   curtainOpenedAt = Date.now();
@@ -486,7 +486,7 @@ function closeCurtainModal() {
 function openSwitchModal() {
   if (!switchModal) return;
   if (isMobileMode) {
-    openMobilePdfPrompt("Light switch document", "Assets/Light%20switch.pdf");
+    openMobilePdfPrompt("A cancer masterswitch", "Assets/Light%20switch.pdf");
     return;
   }
   switchOpenedAt = Date.now();
@@ -507,7 +507,7 @@ function closeSwitchModal() {
 function openBookModal() {
   if (!bookModal) return;
   if (isMobileMode) {
-    openMobilePdfPrompt("Book document", "Assets/Book.pdf");
+    openMobilePdfPrompt("Intersects with key cancer mechanisms", "Assets/Book.pdf");
     return;
   }
   bookOpenedAt = Date.now();
@@ -528,7 +528,7 @@ function closeBookModal() {
 function openBottleModal() {
   if (!bottleModal) return;
   if (isMobileMode) {
-    openMobilePdfPrompt("Bottle document", "Assets/Bottle.pdf");
+    openMobilePdfPrompt("Effecting the whole immune system", "Assets/Bottle.pdf");
     return;
   }
   bottleOpenedAt = Date.now();
