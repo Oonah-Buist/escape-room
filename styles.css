@@ -909,6 +909,14 @@ html.is-ios-webkit .sunlight-ray {
   white-space: pre-line;
 }
 
+.mobile-popup-message:empty {
+  display: none;
+}
+
+.mobile-popup-message:empty + .mobile-popup-actions {
+  margin-top: 0.55rem;
+}
+
 .mobile-popup-actions {
   display: flex;
   flex-direction: column;

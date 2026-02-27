@@ -195,7 +195,7 @@ function openMobilePopup({ title, message, pdfPath = "" }) {
 function openMobilePdfPrompt(title, pdfPath) {
   openMobilePopup({
     title,
-    message: "Tap Open PDF to view in a new tab.\nThen tap Return to room to continue.",
+    message: "",
     pdfPath,
   });
 }
